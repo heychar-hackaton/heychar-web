@@ -1,0 +1,135 @@
+import { relations } from 'drizzle-orm';
+import {
+  boolean,
+  jsonb,
+  numeric,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
+import { users } from './auth';
+
+// -------------------- ENUMS --------------------
+export const skillTypeEnum = pgEnum('skill_type_enum', ['hard', 'soft']);
+export const interviewRecommendationEnum = pgEnum(
+  'interview_recommendation_enum',
+  ['next_stage', 'rejection', 'needs_clarification']
+);
+
+// -------------------- Domain tables --------------------
+export const organisations = pgTable('organisations', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  description: text('description'),
+  userId: text('user_id').references(() => users.id, { onDelete: 'set null' }),
+});
+
+export const jobs = pgTable('jobs', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  title: text('title').notNull(),
+  description: text('description'),
+  organisationId: text('organisation_id').references(() => organisations.id, {
+    onDelete: 'cascade',
+  }),
+});
+
+export const candidates = pgTable('candidates', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  resumeUrl: text('resume_url'),
+  description: text('description'),
+  summary: text('summary'),
+  email: text('email'),
+  phone: text('phone'),
+});
+
+export const interviews = pgTable('interviews', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  organisationId: text('organisation_id').references(() => organisations.id, {
+    onDelete: 'set null',
+  }),
+  jobId: text('job_id').references(() => jobs.id, { onDelete: 'set null' }),
+  candidateId: text('candidate_id').references(() => candidates.id, {
+    onDelete: 'cascade',
+  }),
+  completed: boolean('completed').default(false).notNull(),
+  messages:
+    jsonb('messages').$type<
+      {
+        role: 'user' | 'assistant';
+        content: string;
+      }[]
+    >(),
+  summary: text('summary'),
+  recordingUrl: text('recording_url'),
+  matchPercentage: numeric('match_percentage'),
+  recommendation: interviewRecommendationEnum('recommendation'),
+  startTime: timestamp('start_time', { withTimezone: true, mode: 'date' }),
+  endTime: timestamp('end_time', { withTimezone: true, mode: 'date' }),
+});
+
+export const skills = pgTable('skills', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  candidateId: text('candidate_id').references(() => candidates.id, {
+    onDelete: 'cascade',
+  }),
+  name: text('name').notNull(),
+  type: skillTypeEnum('type'),
+  value: numeric('value'),
+});
+
+// -------------------- Relations --------------------
+
+export const organisationsRelations = relations(
+  organisations,
+  ({ one, many }) => ({
+    owner: one(users, {
+      fields: [organisations.userId],
+      references: [users.id],
+    }),
+    jobs: many(jobs),
+    interviews: many(interviews),
+  })
+);
+
+export const jobsRelations = relations(jobs, ({ one, many }) => ({
+  organisation: one(organisations, {
+    fields: [jobs.organisationId],
+    references: [organisations.id],
+  }),
+  interviews: many(interviews),
+}));
+
+export const candidatesRelations = relations(candidates, ({ many }) => ({
+  interviews: many(interviews),
+  skills: many(skills),
+}));
+
+export const interviewsRelations = relations(interviews, ({ one }) => ({
+  organisation: one(organisations, {
+    fields: [interviews.organisationId],
+    references: [organisations.id],
+  }),
+  job: one(jobs, { fields: [interviews.jobId], references: [jobs.id] }),
+  candidate: one(candidates, {
+    fields: [interviews.candidateId],
+    references: [candidates.id],
+  }),
+}));
+
+export const skillsRelations = relations(skills, ({ one }) => ({
+  candidate: one(candidates, {
+    fields: [skills.candidateId],
+    references: [candidates.id],
+  }),
+}));

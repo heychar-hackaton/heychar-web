@@ -1,0 +1,23 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
+  "extends": [
+    "ultracite"
+  ],
+  "linter": {
+    "rules": {
+      "style": {
+        "noMagicNumbers": "off"
+      },
+      "nursery": {
+        "noShadow": "off"
+      },
+      "suspicious": {
+        "noDocumentCookie": "off",
+        "useAwait": "off"
+      },
+      "performance": {
+        "noNamespaceImport": "off"
+      }
+    }
+  }
+}
