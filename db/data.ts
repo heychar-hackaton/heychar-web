@@ -27,6 +27,18 @@ export const organisations = pgTable('organisations', {
   userId: text('user_id').references(() => users.id, { onDelete: 'set null' }),
 });
 
+// Stores encrypted per-organisation secrets (AES-256-GCM packed JSON)
+export const organisationSecrets = pgTable('organisation_secrets', {
+  organisationId: text('organisation_id')
+    .primaryKey()
+    .references(() => organisations.id, { onDelete: 'cascade' }),
+  apiKeyEnc: text('api_key_enc'),
+  folderIdEnc: text('folder_id_enc'),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
+    .defaultNow()
+    .notNull(),
+});
+
 export const jobs = pgTable('jobs', {
   id: text('id')
     .primaryKey()
@@ -99,6 +111,10 @@ export const organisationsRelations = relations(
     }),
     jobs: many(jobs),
     interviews: many(interviews),
+    secrets: one(organisationSecrets, {
+      fields: [organisations.id],
+      references: [organisationSecrets.organisationId],
+    }),
   })
 );
 

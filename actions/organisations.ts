@@ -4,9 +4,10 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import { db } from '@/db';
-import { organisations } from '@/db/data';
+import { organisationSecrets, organisations } from '@/db/data';
 import type { FormResult } from '@/lib/types';
 import { formError, okResult } from '@/lib/utils';
+import { decryptString, encryptString, pack, unpack } from '@/utils/crypto';
 
 export async function hasAnyOrganisation() {
   const session = await auth();
@@ -38,17 +39,29 @@ export const createOrganisation = async (
 ): Promise<FormResult> => {
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
+  const yandexApiKeyRaw = (formData.get('yandexApiKey') as string) ?? '';
+  const yandexFolderIdRaw = (formData.get('yandexFolderId') as string) ?? '';
 
   const orgSchema = z.object({
     name: z.string().nonempty('Имя организации не может быть пустым'),
     description: z
       .string()
       .nonempty('Описание организации не может быть пустым'),
+    yandexApiKey: z
+      .string()
+      .trim()
+      .min(1, 'YANDEX_API_KEY обязателен'),
+    yandexFolderId: z
+      .string()
+      .trim()
+      .min(1, 'YANDEX_FOLDER_ID обязателен'),
   });
 
   const org = orgSchema.safeParse({
     name,
     description,
+    yandexApiKey: yandexApiKeyRaw,
+    yandexFolderId: yandexFolderIdRaw,
   });
 
   if (!org.success) {
@@ -60,11 +73,109 @@ export const createOrganisation = async (
     throw new Error('Unauthorized');
   }
 
-  await db.insert(organisations).values({
-    name,
-    description,
-    userId: session.user.id as string,
-  });
+  const inserted = await db
+    .insert(organisations)
+    .values({
+      name,
+      description,
+      userId: session.user.id as string,
+    })
+    .returning({ id: organisations.id });
+
+  const organisationId = inserted[0]?.id;
+  if (organisationId) {
+    const { yandexApiKey, yandexFolderId } = org.data;
+    await setOrganisationSecrets({ organisationId, yandexApiKey, yandexFolderId });
+  }
 
   return okResult();
 };
+
+const secretsSchema = z.object({
+  organisationId: z.string().min(1),
+  yandexApiKey: z.string().min(1).optional(),
+  yandexFolderId: z.string().min(1).optional(),
+});
+
+// Server-only: set or update encrypted secrets for organisation
+export async function setOrganisationSecrets(
+  input: unknown
+): Promise<FormResult> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  const parsed = secretsSchema.safeParse(input);
+  if (!parsed.success) {
+    return formError(parsed.error.issues);
+  }
+  const { organisationId, yandexApiKey, yandexFolderId } = parsed.data;
+
+  // Ensure organisation belongs to user
+  const org = await db.query.organisations.findFirst({
+    where: eq(organisations.id, organisationId),
+  });
+  if (!org || org.userId !== (session.user.id as string)) {
+    throw new Error('Forbidden');
+  }
+
+  const aad = organisationId; // bind ciphertexts to org id
+  const apiKeyEnc = yandexApiKey
+    ? pack(encryptString(yandexApiKey, aad))
+    : undefined;
+  const folderIdEnc = yandexFolderId
+    ? pack(encryptString(yandexFolderId, aad))
+    : undefined;
+
+  // Upsert by primary key organisation_id
+  await db
+    .insert(organisationSecrets)
+    .values({
+      organisationId,
+      apiKeyEnc: apiKeyEnc ?? undefined,
+      folderIdEnc: folderIdEnc ?? undefined,
+    })
+    .onConflictDoUpdate({
+      target: organisationSecrets.organisationId,
+      set: {
+        apiKeyEnc: apiKeyEnc ?? organisationSecrets.apiKeyEnc,
+        folderIdEnc: folderIdEnc ?? organisationSecrets.folderIdEnc,
+        updatedAt: new Date(),
+      },
+    });
+
+  return okResult();
+}
+
+// Server-only: read decrypted secrets (only on server, do not expose to client)
+export async function getOrganisationSecrets(organisationId: string): Promise<{
+  yandexApiKey?: string;
+  yandexFolderId?: string;
+} | null> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  const org = await db.query.organisations.findFirst({
+    where: eq(organisations.id, organisationId),
+    with: { secrets: true },
+  });
+  if (!org || org.userId !== (session.user.id as string)) {
+    throw new Error('Forbidden');
+  }
+  if (!org.secrets) {
+    return null;
+  }
+
+  const aad = organisationId;
+  const res: { yandexApiKey?: string; yandexFolderId?: string } = {};
+  if (org.secrets.apiKeyEnc) {
+    res.yandexApiKey = decryptString(unpack(org.secrets.apiKeyEnc), aad);
+  }
+  if (org.secrets.folderIdEnc) {
+    res.yandexFolderId = decryptString(unpack(org.secrets.folderIdEnc), aad);
+  }
+  return res;
+}
