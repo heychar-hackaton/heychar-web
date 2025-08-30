@@ -4,9 +4,9 @@ import { EmptyState } from "./empty-state"
 export const WIP = () => {
   return (
     <EmptyState
-      description="Мы пока что это не реализовали"
+      description="Но очень стараемся это сделать"
       illustration={<EmptyWindow />}
-      title="WIP"
+      title="Мы пока что это не реализовали"
     />
   )
 }

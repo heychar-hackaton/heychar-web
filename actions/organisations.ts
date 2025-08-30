@@ -20,6 +20,18 @@ export async function hasAnyOrganisation() {
   return !!org;
 }
 
+export async function OrganisationList() {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+  const orgs = await db.query.organisations.findMany({
+    where: eq(organisations.userId, session.user.id as string),
+  });
+
+  return orgs;
+}
+
 export const createOrganisation = async (
   _: FormResult,
   formData: FormData
