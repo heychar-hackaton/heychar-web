@@ -1,6 +1,12 @@
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import type { accounts, sessions, users, verificationTokens } from './auth';
-import type { candidates, interviews, jobs, organisations, skills } from './data';
+import type {
+  candidates,
+  interviews,
+  jobs,
+  organisations,
+  skills,
+} from './data';
 
 export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;

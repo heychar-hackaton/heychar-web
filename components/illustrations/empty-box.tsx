@@ -1,15 +1,15 @@
-import type React from "react"
+import type React from 'react';
 
 type EmptyBoxProps = {
-  width?: string | number
-  height?: string | number
-  className?: string
-}
+  width?: string | number;
+  height?: string | number;
+  className?: string;
+};
 
 export const EmptyBox: React.FC<EmptyBoxProps> = ({
   width = 161,
   height = 160,
-  className = "",
+  className = '',
 }) => {
   return (
     <svg
@@ -189,7 +189,7 @@ export const EmptyBox: React.FC<EmptyBoxProps> = ({
         </linearGradient>
       </defs>
     </svg>
-  )
-}
+  );
+};
 
-export default EmptyBox
+export default EmptyBox;

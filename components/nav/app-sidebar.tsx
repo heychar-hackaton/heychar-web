@@ -3,8 +3,8 @@ import {
   IconHexagonLetterHFilled,
   IconPhone,
   IconUsers,
-} from "@tabler/icons-react"
-import Link from "next/link"
+} from '@tabler/icons-react';
+import Link from 'next/link';
 import {
   Sidebar,
   SidebarContent,
@@ -16,27 +16,27 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { NavUser } from "./nav-user"
-import { SidebarMenuButton as SidebarMenuButtonLink } from "./sidebar-menu-button"
+} from '@/components/ui/sidebar';
+import { NavUser } from './nav-user';
+import { SidebarMenuButton as SidebarMenuButtonLink } from './sidebar-menu-button';
 
 const menuItems = [
   {
-    title: "Собеседования",
-    href: "/interviews",
+    title: 'Собеседования',
+    href: '/interviews',
     icon: IconPhone,
   },
   {
-    title: "Кандидаты",
-    href: "/candidates",
+    title: 'Кандидаты',
+    href: '/candidates',
     icon: IconUsers,
   },
   {
-    title: "Организации",
-    href: "/organisations",
+    title: 'Организации',
+    href: '/organisations',
     icon: IconBuilding,
   },
-]
+];
 
 export function AppSidebar() {
   return (
@@ -77,5 +77,5 @@ export function AppSidebar() {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

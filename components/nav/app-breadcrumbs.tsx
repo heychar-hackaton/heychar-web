@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import { IconHexagonLetterHFilled } from "@tabler/icons-react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Fragment, useEffect, useState } from "react"
+import { IconHexagonLetterHFilled } from '@tabler/icons-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Fragment, useEffect, useState } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,44 +11,44 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "../ui/breadcrumb"
+} from '../ui/breadcrumb';
 
 const BreadcrumbsPages = {
-  interviews: "Собеседования",
-  candidates: "Кандидаты",
-  organisations: "Организации",
-  new: "Создание",
-}
+  interviews: 'Собеседования',
+  candidates: 'Кандидаты',
+  organisations: 'Организации',
+  new: 'Создание',
+};
 
 export const AppBreadcrumbs = () => {
-  const pathname = usePathname()
+  const pathname = usePathname();
   const [breadcrumbs, setBreadcrumbs] = useState<
     {
-      href: string
-      text: string
+      href: string;
+      text: string;
     }[]
-  >([])
+  >([]);
 
   useEffect(() => {
-    const asPathNestedRoutes = pathname?.split("/").filter((v) => v.length > 0)
+    const asPathNestedRoutes = pathname?.split('/').filter((v) => v.length > 0);
 
     const crumblist = asPathNestedRoutes.map((subpath, idx) => {
-      const href = `/${asPathNestedRoutes.slice(0, idx + 1).join("/")}`
-      const text = subpath
-      return { href, text }
-    })
+      const href = `/${asPathNestedRoutes.slice(0, idx + 1).join('/')}`;
+      const text = subpath;
+      return { href, text };
+    });
 
-    setBreadcrumbs([{ href: "/", text: "Home" }, ...crumblist])
-  }, [pathname])
+    setBreadcrumbs([{ href: '/', text: 'Home' }, ...crumblist]);
+  }, [pathname]);
 
   const getTitle = (id: string) => {
     return (
       BreadcrumbsPages[id as keyof typeof BreadcrumbsPages] || document.title
-    )
-  }
+    );
+  };
 
   if (breadcrumbs.length === 1) {
-    return "Главная"
+    return 'Главная';
   }
 
   return (
@@ -61,7 +61,7 @@ export const AppBreadcrumbs = () => {
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
                     <Link href={crumb.href}>
-                      {crumb.href === "/" ? (
+                      {crumb.href === '/' ? (
                         <IconHexagonLetterHFilled className="size-4" />
                       ) : (
                         getTitle(crumb.text)
@@ -71,15 +71,15 @@ export const AppBreadcrumbs = () => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
               </Fragment>
-            )
+            );
           }
           return (
             <BreadcrumbPage key={crumb.href}>
               {getTitle(crumb.text)}
             </BreadcrumbPage>
-          )
+          );
         })}
       </BreadcrumbList>
     </Breadcrumb>
-  )
-}
+  );
+};

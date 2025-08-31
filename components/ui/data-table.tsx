@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { type RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { type RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -14,9 +14,9 @@ import {
   type SortingState,
   type Table as TanStackTable,
   useReactTable,
-} from "@tanstack/react-table"
-import * as React from "react"
-import { DebouncedInput } from "@/components/ui/debounce-input"
+} from '@tanstack/react-table';
+import * as React from 'react';
+import { DebouncedInput } from '@/components/ui/debounce-input';
 import {
   Table,
   TableBody,
@@ -24,47 +24,47 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { cn } from "@/lib/utils"
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
-import { DataTablePagination } from "./data-table-pagination"
+import { DataTablePagination } from './data-table-pagination';
 
 type DataTableProps<TData, TValue> = {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-}
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+};
 
-declare module "@tanstack/react-table" {
+declare module '@tanstack/react-table' {
   //add fuzzy filter to the filterFns
   interface FilterFns {
-    fuzzy: FilterFn<unknown>
+    fuzzy: FilterFn<unknown>;
   }
   interface FilterMeta {
-    itemRank: RankingInfo
+    itemRank: RankingInfo;
   }
 }
 
 const fuzzyFilter: FilterFn<unknown> = (row, columnId, value, addMeta) => {
   // Rank the item
-  const itemRank = rankItem(row.getValue(columnId), value)
+  const itemRank = rankItem(row.getValue(columnId), value);
 
   // Store the itemRank info
   addMeta({
     itemRank,
-  })
+  });
 
   // Return if the item should be filtered in/out
-  return itemRank.passed
-}
+  return itemRank.passed;
+};
 
 type AdditionalProps<TData> = {
-  actions?: (table: TanStackTable<TData>) => React.ReactNode
-  rowClassName?: string
-  onRowClick?: (row: Row<TData>) => void
-  initialFilters?: ColumnFiltersState
-  disabled?: boolean
-  hideSearch?: boolean
-}
+  actions?: (table: TanStackTable<TData>) => React.ReactNode;
+  rowClassName?: string;
+  onRowClick?: (row: Row<TData>) => void;
+  initialFilters?: ColumnFiltersState;
+  disabled?: boolean;
+  hideSearch?: boolean;
+};
 
 export function DataTable<TData, TValue>({
   columns,
@@ -76,15 +76,15 @@ export function DataTable<TData, TValue>({
   disabled,
   hideSearch,
 }: DataTableProps<TData, TValue> & AdditionalProps<TData>) {
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] =
-    React.useState<ColumnFiltersState>(initialFilters)
-  const [globalFilter, setGlobalFilter] = React.useState("")
+    React.useState<ColumnFiltersState>(initialFilters);
+  const [globalFilter, setGlobalFilter] = React.useState('');
   const [pagination, setPagination] = React.useState({
     pageIndex: 0, //initial page index
     pageSize: 20, //default page size
-  })
+  });
 
   const table = useReactTable({
     data,
@@ -98,7 +98,7 @@ export function DataTable<TData, TValue>({
     onRowSelectionChange: setRowSelection,
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
-    globalFilterFn: "fuzzy",
+    globalFilterFn: 'fuzzy',
     filterFns: {
       fuzzy: fuzzyFilter,
     },
@@ -109,13 +109,13 @@ export function DataTable<TData, TValue>({
       columnFilters,
       pagination,
     },
-  })
+  });
 
   return (
     <div
       className={cn(
-        "max-w-5xl",
-        disabled ? "pointer-events-none opacity-50" : ""
+        'max-w-5xl',
+        disabled ? 'pointer-events-none opacity-50' : ''
       )}
     >
       <div className="flex items-center justify-between gap-3 py-2">
@@ -125,7 +125,7 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Найти..."
-            value={globalFilter ?? ""}
+            value={globalFilter ?? ''}
           />
         )}
       </div>
@@ -141,7 +141,7 @@ export function DataTable<TData, TValue>({
                       style={{
                         width:
                           header.getSize() === 150
-                            ? "auto"
+                            ? 'auto'
                             : `${header.getSize()}px`,
                       }}
                     >
@@ -152,7 +152,7 @@ export function DataTable<TData, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -162,7 +162,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   className={rowClassName}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                   key={row.id}
                   onClick={() => onRowClick?.(row)}
                 >
@@ -191,5 +191,5 @@ export function DataTable<TData, TValue>({
       </div>
       <DataTablePagination table={table} />
     </div>
-  )
+  );
 }

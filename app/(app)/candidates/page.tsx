@@ -1,10 +1,10 @@
-import type { Metadata } from "next"
-import { WIP } from "@/components/ui/wip"
+import type { Metadata } from 'next';
+import { WIP } from '@/components/ui/wip';
 
 export const metadata: Metadata = {
-  title: "Кандидаты",
-}
+  title: 'Кандидаты',
+};
 
 export default function Page() {
-  return <WIP />
+  return <WIP />;
 }

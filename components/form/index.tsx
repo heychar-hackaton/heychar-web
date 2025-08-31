@@ -1,15 +1,15 @@
-"use client"
+'use client';
 
-import { CircleExclamationFill } from "@gravity-ui/icons"
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import PageHeader from "./page-header"
+import { CircleExclamationFill } from '@gravity-ui/icons';
+import * as React from 'react';
+import { cn } from '@/lib/utils';
+import PageHeader from './page-header';
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
-  errors?: string[]
-  info?: React.ReactNode
-  headerTitle?: React.ReactNode
-  headerDescription?: React.ReactNode
+  errors?: string[];
+  info?: React.ReactNode;
+  headerTitle?: React.ReactNode;
+  headerDescription?: React.ReactNode;
 }
 
 const Form = React.forwardRef<HTMLFormElement, FormProps>(
@@ -27,7 +27,7 @@ const Form = React.forwardRef<HTMLFormElement, FormProps>(
   ) => {
     return (
       <form
-        className={cn("grid max-w-2xl gap-6 pb-5", className)}
+        className={cn('grid max-w-2xl gap-6 pb-5', className)}
         {...props}
         ref={ref}
       >
@@ -56,9 +56,9 @@ const Form = React.forwardRef<HTMLFormElement, FormProps>(
 
         {children}
       </form>
-    )
+    );
   }
-)
-Form.displayName = "Form"
+);
+Form.displayName = 'Form';
 
-export { Form }
+export { Form };

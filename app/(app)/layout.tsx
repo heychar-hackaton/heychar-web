@@ -1,12 +1,12 @@
-import { SessionProvider } from "next-auth/react"
-import { AppBreadcrumbs } from "@/components/nav/app-breadcrumbs"
-import { AppSidebar } from "@/components/nav/app-sidebar"
-import { Separator } from "@/components/ui/separator"
+import { SessionProvider } from 'next-auth/react';
+import { AppBreadcrumbs } from '@/components/nav/app-breadcrumbs';
+import { AppSidebar } from '@/components/nav/app-sidebar';
+import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -30,5 +30,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </SidebarInset>
       </SidebarProvider>
     </SessionProvider>
-  )
+  );
 }

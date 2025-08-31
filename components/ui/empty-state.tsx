@@ -1,16 +1,16 @@
-import Link from "next/link"
-import { Button } from "./button"
+import Link from 'next/link';
+import { Button } from './button';
 
 type Props = {
-  title: string
-  description?: string
-  illustration?: React.ReactNode
+  title: string;
+  description?: string;
+  illustration?: React.ReactNode;
   mainAction?: {
-    icon?: React.ReactNode
-    title: string
-    link: string
-  }
-}
+    icon?: React.ReactNode;
+    title: string;
+    link: string;
+  };
+};
 
 export const EmptyState = ({
   title,
@@ -34,5 +34,5 @@ export const EmptyState = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};

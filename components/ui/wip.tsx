@@ -1,5 +1,5 @@
-import EmptyWindow from "../illustrations/empty-window"
-import { EmptyState } from "./empty-state"
+import EmptyWindow from '../illustrations/empty-window';
+import { EmptyState } from './empty-state';
 
 export const WIP = () => {
   return (
@@ -8,5 +8,5 @@ export const WIP = () => {
       illustration={<EmptyWindow />}
       title="Мы пока что это не реализовали"
     />
-  )
-}
+  );
+};

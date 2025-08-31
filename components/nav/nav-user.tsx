@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import { ChevronsUpDown, LogOut } from "lucide-react"
-import { useSession } from "next-auth/react"
-import { signOut } from "@/actions/auth"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ChevronsUpDown, LogOut } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { signOut } from '@/actions/auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,31 +11,31 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
 
 export function NavUser() {
-  const { isMobile } = useSidebar()
-  const session = useSession()
+  const { isMobile } = useSidebar();
+  const session = useSession();
 
-  const user = session.data?.user
+  const user = session.data?.user;
   if (!user) {
-    return null
+    return null;
   }
 
   const UserAvatar = (
     <Avatar className="h-8 w-8 rounded-lg">
-      <AvatarImage alt={user.name ?? ""} src={user.image ?? ""} />
+      <AvatarImage alt={user.name ?? ''} src={user.image ?? ''} />
       <AvatarFallback className="rounded-lg">
         {user.name?.slice(0, 1)}
       </AvatarFallback>
     </Avatar>
-  )
+  );
 
   return (
     <SidebarMenu>
@@ -57,7 +57,7 @@ export function NavUser() {
           <DropdownMenuContent
             align="end"
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? 'bottom' : 'right'}
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
@@ -78,5 +78,5 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

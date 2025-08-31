@@ -1,6 +1,7 @@
 'use server';
 
 import { eq } from 'drizzle-orm';
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import { db } from '@/db';
@@ -8,7 +9,6 @@ import { organisationSecrets, organisations } from '@/db/data';
 import type { FormResult } from '@/lib/types';
 import { formError, okResult } from '@/lib/utils';
 import { decryptString, encryptString, pack, unpack } from '@/utils/crypto';
-import { redirect } from 'next/navigation';
 
 export async function hasAnyOrganisation() {
   const session = await auth();
@@ -48,14 +48,8 @@ export const createOrganisation = async (
     description: z
       .string()
       .nonempty('Описание организации не может быть пустым'),
-    yandexApiKey: z
-      .string()
-      .trim()
-      .min(1, 'YANDEX_API_KEY обязателен'),
-    yandexFolderId: z
-      .string()
-      .trim()
-      .min(1, 'YANDEX_FOLDER_ID обязателен'),
+    yandexApiKey: z.string().trim().min(1, 'YANDEX_API_KEY обязателен'),
+    yandexFolderId: z.string().trim().min(1, 'YANDEX_FOLDER_ID обязателен'),
   });
 
   const org = orgSchema.safeParse({
@@ -86,10 +80,14 @@ export const createOrganisation = async (
   const organisationId = inserted[0]?.id;
   if (organisationId) {
     const { yandexApiKey, yandexFolderId } = org.data;
-    await setOrganisationSecrets({ organisationId, yandexApiKey, yandexFolderId });
+    await setOrganisationSecrets({
+      organisationId,
+      yandexApiKey,
+      yandexFolderId,
+    });
   }
 
-  redirect(`/organisations`);
+  redirect('/organisations');
 };
 
 const secretsSchema = z.object({

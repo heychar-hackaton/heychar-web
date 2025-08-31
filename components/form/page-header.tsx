@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react"
+import React, { type ReactNode } from "react"
 
 const PageHeader = ({
   title,
@@ -9,9 +9,9 @@ const PageHeader = ({
 }) => {
   return (
     <div className="mb-2">
-      <h1 className="text-lg font-semibold">{title}</h1>
+      <h1 className="font-semibold text-lg">{title}</h1>
       {description && (
-        <span className="text-sm text-muted-foreground">{description}</span>
+        <span className="text-muted-foreground text-sm">{description}</span>
       )}
     </div>
   )
