@@ -14,9 +14,9 @@ const FormSegmentHeader = ({
     <div className={cn("mt-2 font-semibold text-sm", className)}>
       {label}
       {description && (
-        <span className="text-sm font-normal text-muted-foreground">
+        <div className="text-sm font-normal text-muted-foreground">
           {description}
-        </span>
+        </div>
       )}
     </div>
   )
