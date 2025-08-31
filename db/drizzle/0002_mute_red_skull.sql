@@ -1,0 +1,1 @@
+ALTER TABLE "jobs" RENAME COLUMN "title" TO "name";

@@ -43,11 +43,12 @@ export const jobs = pgTable('jobs', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  title: text('title').notNull(),
+  name: text('name').notNull(),
   description: text('description'),
   organisationId: text('organisation_id').references(() => organisations.id, {
     onDelete: 'cascade',
   }),
+  archived: boolean('archived').default(false).notNull(),
 });
 
 export const candidates = pgTable('candidates', {
