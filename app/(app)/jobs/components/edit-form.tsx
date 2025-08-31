@@ -23,11 +23,19 @@ export function EditJobForm({ job }: { job: Job }) {
   const [data, dispatch] = useActionState(updateJob, {})
 
   return (
-    <Form action={dispatch} errors={data.errors} headerTitle="Редактирование вакансии">
+    <Form
+      action={dispatch}
+      errors={data.errors}
+      headerTitle="Редактирование вакансии"
+    >
       <FormBody>
         <input type="hidden" name="id" value={job.id} />
         <FormField>
-          <Label className="flex-5/12" htmlFor="organisationId" required>
+          <Label
+            className="basis-3/12 shrink-0"
+            htmlFor="organisationId"
+            required
+          >
             Организация
           </Label>
           <FormSelect
@@ -37,13 +45,23 @@ export function EditJobForm({ job }: { job: Job }) {
           />
         </FormField>
         <FormField>
-          <Label className="flex-5/12" htmlFor="name" required>
+          <Label className="basis-3/12 shrink-0" htmlFor="name" required>
             Наименование
           </Label>
-          <Input autoComplete="off" name="name" required type="text" defaultValue={job.name} />
+          <Input
+            autoComplete="off"
+            name="name"
+            required
+            type="text"
+            defaultValue={job.name}
+          />
         </FormField>
-        <FormField className="flex-col">
-          <Label htmlFor="description" required>
+        <FormField className="items-start">
+          <Label
+            className="basis-3/12 shrink-0 mt-1"
+            htmlFor="description"
+            required
+          >
             Описание
           </Label>
           <Textarea

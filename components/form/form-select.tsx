@@ -38,7 +38,7 @@ export const FormSelect = (props: FormSelectProps) => {
   return (
     <Select {...props} disabled={loading}>
       <SelectTrigger className="w-full">
-        <SelectValue placeholder={loading ? "Загрузка..." : ""} />
+        <SelectValue placeholder={loading ? "Загрузка..." : "Не выбрано"} />
       </SelectTrigger>
       <SelectContent className="w-full">
         <SelectGroup>

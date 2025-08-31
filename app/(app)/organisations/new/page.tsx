@@ -54,13 +54,17 @@ export default function NewOrganisation() {
     >
       <FormBody>
         <FormField>
-          <Label className="flex-5/12" htmlFor="name" required>
+          <Label className="basis-3/12 shrink-0" htmlFor="name" required>
             Наименование
           </Label>
           <Input autoComplete="off" name="name" required type="text" />
         </FormField>
-        <FormField className="flex-col">
-          <Label htmlFor="description" required>
+        <FormField className="items-start">
+          <Label
+            className="basis-3/12 shrink-0 mt-1"
+            htmlFor="description"
+            required
+          >
             Описание
           </Label>
           <Textarea
@@ -74,12 +78,11 @@ export default function NewOrganisation() {
           description={
             <span>
               Роли сервисного аккаунта в каталоге:
-              <div className="flex gap-1">
+              <div className="flex gap-1 mb-2">
                 <Badge variant="secondary">ai.speechkit-stt.user</Badge>
                 <Badge variant="secondary">ai.speechkit-tts.user</Badge>
                 <Badge variant="secondary">ai.languageModels.user</Badge>
               </div>
-              <br />
               Область действия API ключа:
               <div className="flex gap-1">
                 <Badge variant="secondary">yc.ai.speechkitTts.execute</Badge>

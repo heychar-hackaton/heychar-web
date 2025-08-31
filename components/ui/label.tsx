@@ -17,7 +17,7 @@ function Label({
   className?: string;
 }) {
   return (
-    <div className={cn('flex w-full items-center gap-1', className)}>
+    <div className={cn('flex items-center gap-1', className)}>
       <LabelPrimitive.Root
         className={cn(
           'flex select-none items-center gap-2 font-medium text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50 group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50',

@@ -31,19 +31,23 @@ export default function NewJobPage() {
     >
       <FormBody>
         <FormField>
-          <Label className="flex-5/12" htmlFor="name" required>
+          <Label className="basis-3/12 shrink-0" htmlFor="name" required>
             Организация
           </Label>
           <FormSelect getOptions={getOrganisations} name="organisationId" />
         </FormField>
         <FormField>
-          <Label className="flex-5/12" htmlFor="name" required>
+          <Label className="basis-3/12 shrink-0" htmlFor="name" required>
             Наименование
           </Label>
           <Input autoComplete="off" name="name" required type="text" />
         </FormField>
-        <FormField className="flex-col">
-          <Label htmlFor="description" required>
+        <FormField className="items-start">
+          <Label
+            className="basis-3/12 shrink-0 mt-1"
+            htmlFor="description"
+            required
+          >
             Описание
           </Label>
           <Textarea
