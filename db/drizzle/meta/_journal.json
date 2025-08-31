@@ -8,6 +8,13 @@
       "when": 1756449767702,
       "tag": "0000_special_xorn",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1756643870068,
+      "tag": "0001_opposite_moonstone",
+      "breakpoints": true
     }
   ]
 }

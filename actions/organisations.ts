@@ -8,6 +8,7 @@ import { organisationSecrets, organisations } from '@/db/data';
 import type { FormResult } from '@/lib/types';
 import { formError, okResult } from '@/lib/utils';
 import { decryptString, encryptString, pack, unpack } from '@/utils/crypto';
+import { redirect } from 'next/navigation';
 
 export async function hasAnyOrganisation() {
   const session = await auth();
@@ -88,7 +89,7 @@ export const createOrganisation = async (
     await setOrganisationSecrets({ organisationId, yandexApiKey, yandexFolderId });
   }
 
-  return okResult();
+  redirect(`/organisations`);
 };
 
 const secretsSchema = z.object({
