@@ -8,29 +8,20 @@ import type {
   skills,
 } from './data';
 
-export type User = InferSelectModel<typeof users>;
-export type NewUser = InferInsertModel<typeof users>;
+export type TUser = InferSelectModel<typeof users>;
+export type TNewUser = InferInsertModel<typeof users>;
 
-export type Account = InferSelectModel<typeof accounts>;
-export type NewAccount = InferInsertModel<typeof accounts>;
+export type TOrganisation = InferSelectModel<typeof organisations>;
+export type TNewOrganisation = InferInsertModel<typeof organisations>;
 
-export type Session = InferSelectModel<typeof sessions>;
-export type NewSession = InferInsertModel<typeof sessions>;
+export type TJob = InferSelectModel<typeof jobs>;
+export type TNewJob = InferInsertModel<typeof jobs>;
 
-export type VerificationToken = InferSelectModel<typeof verificationTokens>;
-export type NewVerificationToken = InferInsertModel<typeof verificationTokens>;
+export type TCandidate = InferSelectModel<typeof candidates>;
+export type TNewCandidate = InferInsertModel<typeof candidates>;
 
-export type organisation = InferSelectModel<typeof organisations>;
-export type Neworganisation = InferInsertModel<typeof organisations>;
+export type TInterview = InferSelectModel<typeof interviews>;
+export type TNewInterview = InferInsertModel<typeof interviews>;
 
-export type Job = InferSelectModel<typeof jobs>;
-export type NewJob = InferInsertModel<typeof jobs>;
-
-export type Candidate = InferSelectModel<typeof candidates>;
-export type NewCandidate = InferInsertModel<typeof candidates>;
-
-export type Interview = InferSelectModel<typeof interviews>;
-export type NewInterview = InferInsertModel<typeof interviews>;
-
-export type Skill = InferSelectModel<typeof skills>;
-export type NewSkill = InferInsertModel<typeof skills>;
+export type TSkill = InferSelectModel<typeof skills>;
+export type TNewSkill = InferInsertModel<typeof skills>;

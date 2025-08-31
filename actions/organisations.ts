@@ -22,7 +22,7 @@ export async function hasAnyOrganisation() {
   return !!org;
 }
 
-export async function OrganisationList() {
+export async function getOrganisations() {
   const session = await auth();
   if (!session?.user) {
     throw new Error('Unauthorized');
@@ -32,6 +32,20 @@ export async function OrganisationList() {
   });
 
   return orgs;
+}
+
+export async function getOrganisationById(id: string) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+  const org = await db.query.organisations.findFirst({
+    where: eq(organisations.id, id),
+  });
+  if (!org || org.userId !== (session.user.id as string)) {
+    return null;
+  }
+  return org;
 }
 
 export const createOrganisation = async (
@@ -85,6 +99,68 @@ export const createOrganisation = async (
       yandexApiKey,
       yandexFolderId,
     });
+  }
+
+  redirect('/organisations');
+};
+
+const updateSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().nonempty('Имя организации не может быть пустым'),
+  description: z
+    .string()
+    .nonempty('Описание организации не может быть пустым'),
+  yandexApiKey: z.string().trim().optional(),
+  yandexFolderId: z.string().trim().optional(),
+});
+
+export const updateOrganisation = async (
+  _: FormResult,
+  formData: FormData
+): Promise<FormResult> => {
+  const id = (formData.get('id') as string) ?? '';
+  const name = formData.get('name') as string;
+  const description = formData.get('description') as string;
+  const yandexApiKey = (formData.get('yandexApiKey') as string) || '';
+  const yandexFolderId = (formData.get('yandexFolderId') as string) || '';
+
+  const parsed = updateSchema.safeParse({
+    id,
+    name,
+    description,
+    yandexApiKey: yandexApiKey || undefined,
+    yandexFolderId: yandexFolderId || undefined,
+  });
+  if (!parsed.success) {
+    return formError(parsed.error.issues);
+  }
+
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  const org = await db.query.organisations.findFirst({
+    where: eq(organisations.id, id),
+  });
+  if (!org || org.userId !== (session.user.id as string)) {
+    throw new Error('Forbidden');
+  }
+
+  await db
+    .update(organisations)
+    .set({ name, description })
+    .where(eq(organisations.id, id));
+
+  const secretsInput: {
+    organisationId: string;
+    yandexApiKey?: string;
+    yandexFolderId?: string;
+  } = { organisationId: id };
+  if (yandexApiKey) secretsInput.yandexApiKey = yandexApiKey;
+  if (yandexFolderId) secretsInput.yandexFolderId = yandexFolderId;
+  if (secretsInput.yandexApiKey || secretsInput.yandexFolderId) {
+    await setOrganisationSecrets(secretsInput);
   }
 
   redirect('/organisations');
