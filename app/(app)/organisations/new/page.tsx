@@ -54,14 +54,14 @@ export default function NewOrganisation() {
     >
       <FormBody>
         <FormField>
-          <Label className="basis-3/12 shrink-0" htmlFor="name" required>
+          <Label className="shrink-0 basis-3/12" htmlFor="name" required>
             Наименование
           </Label>
           <Input autoComplete="off" name="name" required type="text" />
         </FormField>
         <FormField className="items-start">
           <Label
-            className="basis-3/12 shrink-0 mt-1"
+            className="mt-1 shrink-0 basis-3/12"
             htmlFor="description"
             required
           >
@@ -78,7 +78,7 @@ export default function NewOrganisation() {
           description={
             <span>
               Роли сервисного аккаунта в каталоге:
-              <div className="flex gap-1 mb-2">
+              <div className="mb-2 flex gap-1">
                 <Badge variant="secondary">ai.speechkit-stt.user</Badge>
                 <Badge variant="secondary">ai.speechkit-tts.user</Badge>
                 <Badge variant="secondary">ai.languageModels.user</Badge>

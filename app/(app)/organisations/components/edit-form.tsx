@@ -6,11 +6,11 @@ import { Form } from "@/components/form"
 import FormBody from "@/components/form/form-body"
 import { FormField } from "@/components/form/form-field"
 import FormFooter from "@/components/form/form-footer"
+import FormSegmentHeader from "@/components/form/form-segment-header"
+import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import FormSegmentHeader from "@/components/form/form-segment-header"
-import { Badge } from "@/components/ui/badge"
 
 type Organisation = {
   id: string
@@ -28,22 +28,22 @@ export function EditOrganisationForm({ org }: { org: Organisation }) {
       headerTitle="Редактирование организации"
     >
       <FormBody>
-        <input type="hidden" name="id" value={org.id} />
+        <input name="id" type="hidden" value={org.id} />
         <FormField>
-          <Label className="basis-3/12 shrink-0" htmlFor="name" required>
+          <Label className="shrink-0 basis-3/12" htmlFor="name" required>
             Наименование
           </Label>
           <Input
             autoComplete="off"
+            defaultValue={org.name}
             name="name"
             required
             type="text"
-            defaultValue={org.name}
           />
         </FormField>
         <FormField className="items-start">
           <Label
-            className="basis-3/12 shrink-0 mt-1"
+            className="mt-1 shrink-0 basis-3/12"
             htmlFor="description"
             required
           >
@@ -51,17 +51,17 @@ export function EditOrganisationForm({ org }: { org: Organisation }) {
           </Label>
           <Textarea
             className="max-h-[328px] min-h-[228px] resize-none"
+            defaultValue={org.description ?? ""}
             name="description"
             placeholder="Опишите организацию"
             required
-            defaultValue={org.description ?? ""}
           />
         </FormField>
         <FormSegmentHeader
           description={
             <span>
               Роли сервисного аккаунта в каталоге:
-              <div className="flex gap-1 mb-2">
+              <div className="mb-2 flex gap-1">
                 <Badge variant="secondary">ai.speechkit-stt.user</Badge>
                 <Badge variant="secondary">ai.speechkit-tts.user</Badge>
                 <Badge variant="secondary">ai.languageModels.user</Badge>
@@ -93,7 +93,7 @@ export function EditOrganisationForm({ org }: { org: Organisation }) {
           />
         </FormField>
       </FormBody>
-      <FormFooter submitLabel="Сохранить" cancelLabel="Назад" />
+      <FormFooter cancelLabel="Назад" submitLabel="Сохранить" />
     </Form>
   )
 }

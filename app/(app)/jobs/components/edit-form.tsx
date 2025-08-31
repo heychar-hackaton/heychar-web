@@ -2,15 +2,15 @@
 
 import { useActionState } from "react"
 import { updateJob } from "@/actions/jobs"
+import { getOrganisations } from "@/actions/organisations"
 import { Form } from "@/components/form"
 import FormBody from "@/components/form/form-body"
 import { FormField } from "@/components/form/form-field"
 import FormFooter from "@/components/form/form-footer"
+import { FormSelect } from "@/components/form/form-select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { FormSelect } from "@/components/form/form-select"
-import { getOrganisations } from "@/actions/organisations"
 
 type Job = {
   id: string
@@ -29,36 +29,36 @@ export function EditJobForm({ job }: { job: Job }) {
       headerTitle="Редактирование вакансии"
     >
       <FormBody>
-        <input type="hidden" name="id" value={job.id} />
+        <input name="id" type="hidden" value={job.id} />
         <FormField>
           <Label
-            className="basis-3/12 shrink-0"
+            className="shrink-0 basis-3/12"
             htmlFor="organisationId"
             required
           >
             Организация
           </Label>
           <FormSelect
-            name="organisationId"
             defaultValue={job.organisationId ?? undefined}
             getOptions={getOrganisations}
+            name="organisationId"
           />
         </FormField>
         <FormField>
-          <Label className="basis-3/12 shrink-0" htmlFor="name" required>
+          <Label className="shrink-0 basis-3/12" htmlFor="name" required>
             Наименование
           </Label>
           <Input
             autoComplete="off"
+            defaultValue={job.name}
             name="name"
             required
             type="text"
-            defaultValue={job.name}
           />
         </FormField>
         <FormField className="items-start">
           <Label
-            className="basis-3/12 shrink-0 mt-1"
+            className="mt-1 shrink-0 basis-3/12"
             htmlFor="description"
             required
           >
@@ -66,14 +66,14 @@ export function EditJobForm({ job }: { job: Job }) {
           </Label>
           <Textarea
             className="max-h-[328px] min-h-[228px] resize-none"
+            defaultValue={job.description ?? ""}
             name="description"
             placeholder="Опишите вакансию"
             required
-            defaultValue={job.description ?? ""}
           />
         </FormField>
       </FormBody>
-      <FormFooter submitLabel="Сохранить" cancelLabel="Назад" />
+      <FormFooter cancelLabel="Назад" submitLabel="Сохранить" />
     </Form>
   )
 }
