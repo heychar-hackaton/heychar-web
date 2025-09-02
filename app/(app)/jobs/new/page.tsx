@@ -25,29 +25,78 @@ export default function NewJobPage() {
     const [data, dispatch] = useActionState(createJob, {})
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-    async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const ACCEPTED_MIME_TYPES = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain",
+        "application/rtf",
+        "text/rtf",
+    ] as const
+    const ACCEPTED_EXTENSIONS = [
+        ".pdf",
+        ".doc",
+        ".docx",
+        ".rtf",
+        ".txt",
+    ] as const
+
+    const isFileTypeAccepted = (file: File) => {
+        const byMime = file.type
+            ? ACCEPTED_MIME_TYPES.includes(
+                  file.type as (typeof ACCEPTED_MIME_TYPES)[number]
+              )
+            : false
+        if (byMime) {
+            return true
+        }
+        const name = file.name.toLowerCase()
+        return ACCEPTED_EXTENSIONS.some((ext) => name.endsWith(ext))
+    }
+
+    const processFile = async (file: File) => {
+        if (!isFileTypeAccepted(file)) {
+            toast.error(
+                "Неподдерживаемый тип файла. Допустимо: PDF, DOC, DOCX, RTF, TXT",
+                {
+                    position: "top-center",
+                }
+            )
+            return
+        }
         setIsLoading(true)
+        try {
+            const fd = new FormData()
+            fd.set("file", file)
+            const result = await generateJobDescription(fd)
+
+            if (!result.success) {
+                toast.error(result.text, { position: "top-center" })
+                setIsLoading(false)
+                return
+            }
+
+            const parsed = JSON.parse(
+                result.data.result.alternatives[0].message.text
+            ) as { name: string; description: string; recommendation: string[] }
+            setName(parsed.name)
+            setDescription(parsed.description)
+            setRecommendation(parsed.recommendation)
+        } catch (error) {
+            toast.error("Не удалось обработать файл", {
+                position: "top-center",
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (!file) {
             return
         }
-        const fd = new FormData()
-        fd.set("file", file)
-        const result = await generateJobDescription(fd)
-
-        if (result.success) {
-            const data = JSON.parse(
-                result.data.result.alternatives[0].message.text
-            ) as { name: string; description: string; recommendation: string[] }
-            setName(data.name)
-            setDescription(data.description)
-            setRecommendation(data.recommendation)
-        } else {
-            toast.error(result.text, {
-                position: "top-center",
-            })
-        }
-        setIsLoading(false)
+        await processFile(file)
         e.target.value = ""
     }
 
@@ -55,6 +104,9 @@ export default function NewJobPage() {
         <Form
             action={dispatch}
             errors={data.errors}
+            onFileDrop={(file) => {
+                void processFile(file)
+            }}
             headerActions={
                 <>
                     <input
