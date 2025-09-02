@@ -29,6 +29,20 @@
       "when": 1756652093711,
       "tag": "0003_famous_the_enforcers",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1756843526328,
+      "tag": "0004_flaky_madame_hydra",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1756844992768,
+      "tag": "0005_polite_firestar",
+      "breakpoints": true
     }
   ]
 }

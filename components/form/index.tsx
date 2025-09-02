@@ -28,141 +28,168 @@ const Form = React.forwardRef<HTMLFormElement, FormProps>(
             info,
             headerActions,
             isLoading,
+            onFileDrop,
             ...props
         },
         ref
     ) => {
-        const { onFileDrop } = props
         const [isDragActive, setIsDragActive] = React.useState(false)
-        const [dragCounter, setDragCounter] = React.useState(0)
+        const dropRef = React.useRef<HTMLDivElement | null>(null)
 
-        const handleDragEnter = (e: React.DragEvent) => {
+        // Native handlers for addEventListener to avoid JSX event props on non-interactive elements
+        const handleDragEnterNative = React.useCallback((e: DragEvent) => {
             e.preventDefault()
             e.stopPropagation()
-            setDragCounter((prev) => prev + 1)
             setIsDragActive(true)
-        }
+        }, [])
 
-        const handleDragOver = (e: React.DragEvent) => {
-            e.preventDefault()
-            e.stopPropagation()
-            if (e.dataTransfer) {
-                e.dataTransfer.dropEffect = "copy"
-            }
-            if (!isDragActive) {
-                setIsDragActive(true)
-            }
-        }
-
-        const handleDragLeave = (e: React.DragEvent) => {
-            e.preventDefault()
-            e.stopPropagation()
-            setDragCounter((prev) => {
-                const next = prev - 1
-                if (next <= 0) {
-                    setIsDragActive(false)
-                    return 0
+        const handleDragOverNative = React.useCallback(
+            (e: DragEvent) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (e.dataTransfer) {
+                    e.dataTransfer.dropEffect = "copy"
                 }
-                return next
-            })
-        }
+                if (!isDragActive) {
+                    setIsDragActive(true)
+                }
+            },
+            [isDragActive]
+        )
 
-        const handleDrop = (e: React.DragEvent) => {
+        const handleDragLeaveNative = React.useCallback((e: DragEvent) => {
             e.preventDefault()
             e.stopPropagation()
             setIsDragActive(false)
-            setDragCounter(0)
-            const files = e.dataTransfer?.files
-            if (!files || files.length === 0) {
+        }, [])
+
+        const handleDropNative = React.useCallback(
+            (e: DragEvent) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setIsDragActive(false)
+                const files = e.dataTransfer?.files
+                if (!files || files.length === 0) {
+                    return
+                }
+                const file = files[0]
+                if (onFileDrop) {
+                    onFileDrop(file)
+                }
+                if (e.dataTransfer) {
+                    e.dataTransfer.clearData()
+                }
+            },
+            [onFileDrop]
+        )
+
+        React.useEffect(() => {
+            const node = dropRef.current
+            if (!node) {
                 return
             }
-            const file = files[0]
-            if (onFileDrop) {
-                onFileDrop(file)
+            if (!onFileDrop) {
+                return
             }
-            if (e.dataTransfer) {
-                e.dataTransfer.clearData()
+
+            node.addEventListener("dragenter", handleDragEnterNative)
+            node.addEventListener("dragover", handleDragOverNative)
+            node.addEventListener("dragleave", handleDragLeaveNative)
+            node.addEventListener("drop", handleDropNative)
+
+            return () => {
+                node.removeEventListener("dragenter", handleDragEnterNative)
+                node.removeEventListener("dragover", handleDragOverNative)
+                node.removeEventListener("dragleave", handleDragLeaveNative)
+                node.removeEventListener("drop", handleDropNative)
             }
-        }
+        }, [
+            onFileDrop,
+            handleDragEnterNative,
+            handleDragOverNative,
+            handleDragLeaveNative,
+            handleDropNative,
+        ])
 
         return (
-            <form
-                className={cn("relative grid max-w-2xl gap-6 pb-5", className)}
-                onDragEnter={onFileDrop ? handleDragEnter : undefined}
-                onDragLeave={onFileDrop ? handleDragLeave : undefined}
-                onDragOver={onFileDrop ? handleDragOver : undefined}
-                onDrop={onFileDrop ? handleDrop : undefined}
-                {...props}
-                ref={ref}
-            >
-                <div className="flex flex-col gap-2">
-                    {headerTitle && (
-                        <PageHeader
-                            actions={headerActions}
-                            description={headerDescription}
-                            title={headerTitle}
-                        />
+            <div className="relative" ref={dropRef}>
+                <form
+                    className={cn(
+                        "relative grid max-w-2xl gap-6 pb-5",
+                        className
                     )}
+                    {...props}
+                    ref={ref}
+                >
+                    <div className="flex flex-col gap-2">
+                        {headerTitle && (
+                            <PageHeader
+                                actions={headerActions}
+                                description={headerDescription}
+                                title={headerTitle}
+                            />
+                        )}
 
-                    {errors && (
-                        <div className="flex gap-2 rounded-md p-3 text-destructive ring-1 ring-destructive">
-                            <CircleExclamationFill className="h-4 w-4 shrink-0" />
-                            <div className="text-sm">
-                                {errors.map((item) => (
-                                    <div className="break-words" key={item}>
-                                        - {item}
-                                    </div>
-                                ))}
+                        {errors && (
+                            <div className="flex gap-2 rounded-md p-3 text-destructive ring-1 ring-destructive">
+                                <CircleExclamationFill className="h-4 w-4 shrink-0" />
+                                <div className="text-sm">
+                                    {errors.map((item) => (
+                                        <div className="break-words" key={item}>
+                                            - {item}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                    {info && (
-                        <div className="flex items-start gap-2 rounded-md bg-gradient-to-br from-background via-primary/5 to-primary/15 p-3 text-primary ring-1 ring-primary">
-                            <CircleExclamationFill className="h-4 w-4 shrink-0" />
-                            <div className="text-sm">{info}</div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                        {info && (
+                            <div className="flex items-start gap-2 rounded-md bg-gradient-to-br from-background via-primary/5 to-primary/15 p-3 text-primary ring-1 ring-primary">
+                                <CircleExclamationFill className="h-4 w-4 shrink-0" />
+                                <div className="text-sm">{info}</div>
+                            </div>
+                        )}
+                    </div>
 
-                <AnimatePresence>
-                    {isLoading && (
-                        <motion.div
-                            animate={{ opacity: 1 }}
-                            className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center gap-2 bg-background/85"
-                            exit={{ opacity: 0 }}
-                            initial={{ opacity: 0 }}
-                        >
-                            <IconLoader className="h-4 w-4 shrink-0 animate-spin" />
-                            <span className="text-sm">Загрузка...</span>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                <AnimatePresence>
-                    {onFileDrop && isDragActive && (
-                        <motion.div
-                            animate={{ opacity: 1 }}
-                            aria-hidden
-                            className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-md bg-background/85"
-                            exit={{ opacity: 0 }}
-                            initial={{ opacity: 0 }}
-                            role="presentation"
-                        >
+                    {children}
+                    <AnimatePresence>
+                        {isLoading && (
                             <motion.div
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="flex items-center gap-2 rounded-md border-2 border-primary border-dashed bg-background/80 px-4 py-3 text-primary shadow-sm"
-                                exit={{ opacity: 0, scale: 0 }}
-                                initial={{ opacity: 0, scale: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center gap-2 bg-background/85"
+                                exit={{ opacity: 0 }}
+                                initial={{ opacity: 0 }}
                             >
-                                <IconUpload className="h-4 w-4" />
-                                <span className="text-sm">
-                                    Перетащите файл сюда, чтобы загрузить
-                                </span>
+                                <IconLoader className="h-4 w-4 shrink-0 animate-spin" />
+                                <span className="text-sm">Загрузка...</span>
                             </motion.div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                {children}
-            </form>
+                        )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                        {onFileDrop && isDragActive && (
+                            <motion.div
+                                animate={{ opacity: 1 }}
+                                aria-hidden
+                                className="pointer-events-none absolute inset-0 z-20 flex h-full w-full items-center justify-center rounded-md bg-background/85"
+                                exit={{ opacity: 0 }}
+                                initial={{ opacity: 0 }}
+                                role="presentation"
+                            >
+                                <motion.div
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="flex items-center gap-2 rounded-md border-2 border-primary border-dashed bg-background/80 px-4 py-3 text-primary shadow-sm"
+                                    exit={{ opacity: 0, scale: 0 }}
+                                    initial={{ opacity: 0, scale: 0 }}
+                                >
+                                    <IconUpload className="h-4 w-4" />
+                                    <span className="text-sm">
+                                        Перетащите файл сюда, чтобы загрузить
+                                    </span>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </form>
+            </div>
         )
     }
 )

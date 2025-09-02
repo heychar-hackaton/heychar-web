@@ -55,9 +55,8 @@ export const candidates = pgTable('candidates', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  resumeUrl: text('resume_url'),
   description: text('description'),
-  summary: text('summary'),
+  name: text('name'),
   email: text('email'),
   phone: text('phone'),
 });

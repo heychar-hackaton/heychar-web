@@ -2,7 +2,7 @@
 
 import { toJSONSchema, z } from "zod"
 import { getTextFromFile } from "@/lib/file-parser"
-import { yandexComplete, type YandexCompletionRequest } from "@/lib/yandex"
+import { type YandexCompletionRequest, yandexComplete } from "@/lib/yandex"
 
 type YandexTextResult = {
     result: {
@@ -95,6 +95,88 @@ export const generateJobDescription = async (
         return {
             success: false,
             text: "Не удалось сгенерировать вакансию",
+            data: response.error,
+        }
+    }
+
+    const result = response.data
+
+    return {
+        success: true,
+        data: result,
+        text: "",
+    }
+}
+
+export const generateCandidateDescription = async (
+    formData: FormData
+): Promise<GenerateJobDescriptionResponse> => {
+    const file = formData.get("file") as File | null
+
+    if (!file) {
+        return {
+            success: false,
+            text: "Файл не выбран",
+            data: null,
+        }
+    }
+
+    const data = await getTextFromFile(file)
+
+    if (!data.success) {
+        return {
+            success: false,
+            text: data.text,
+            data: null,
+        }
+    }
+    const jsonSchema = z.object({
+        name: z.string().optional().default(""),
+        email: z.string().optional().default(""),
+        phone: z.string().optional().default(""),
+        description: z.string(),
+    })
+
+    const requestBody: YandexCompletionRequest = {
+        messages: [
+            {
+                role: "system",
+                text: "Ты ассистент, который помогает в рефакторинге резюме.",
+            },
+            {
+                role: "user",
+                text: `Создай подробное описание резюме в текстовом формате. 
+        Ничего не придумывай, используй только эту информацию.
+        Если какие-то поля не заполнены, просто так и напиши - что нет специальных требований.
+        Не пиши информацию о компаннии, не пиши как подать заявку.
+        
+        Ты должен вернуть только JSON-объект, без других текстов.
+        Поле name - это имя кандидата, если нет, то пустая строка.
+        Поле email - это email кандидата, если нет, то пустая строка.
+        Поле phone - это телефон кандидата, если нет, то пустая строка.
+        Поле description - это описание из резюме. Только текст без markdown-разметки, разбитый по разделам - параграфам.
+        Разделы всегда должны быть разделены пустой строкой.
+        Выяви опыт работы, места работы, должности, обязанности, результаты работы, навыки, образования, место жительства, возможность переезда.
+        
+        Информация о резюме: 
+        ${data.text}`,
+            },
+        ],
+        completionOptions: {
+            stream: false,
+        },
+        jsonObject: true,
+        jsonSchema: {
+            schema: toJSONSchema(jsonSchema),
+        },
+    }
+
+    const response = await yandexComplete<YandexTextResult>(requestBody)
+
+    if (!response.ok) {
+        return {
+            success: false,
+            text: "Не удалось сгенерировать резюме",
             data: response.error,
         }
     }

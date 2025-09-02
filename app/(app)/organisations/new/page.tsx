@@ -20,6 +20,14 @@ export default function NewOrganisation() {
         <Form
             action={dispatch}
             errors={data.errors}
+            headerDescription={
+                <span>
+                    Информация об организации помогает агенту лучше разбираться
+                    в вопросах, связанных с ней. <br />
+                    Агент использует API Яндекс для общения с кадидатами.
+                </span>
+            }
+            headerTitle="Создание организации"
             info={
                 <>
                     <h3 className="font-bold">
@@ -50,14 +58,6 @@ export default function NewOrganisation() {
                     </ul>
                 </>
             }
-            headerDescription={
-                <span>
-                    Информация об организации помогает агенту лучше разбираться
-                    в вопросах, связанных с ней. <br />
-                    Агент использует API Яндекс для общения с кадидатами.
-                </span>
-            }
-            headerTitle="Создание организации"
         >
             <FormBody>
                 <FormField>

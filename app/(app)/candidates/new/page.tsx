@@ -3,26 +3,26 @@
 import { IconUpload } from "@tabler/icons-react"
 import { useActionState, useRef, useState } from "react"
 import { toast } from "sonner"
-import { generateJobDescription } from "@/actions/ai"
-import { createJob } from "@/actions/jobs"
-import { getOrganisations } from "@/actions/organisations"
+import { generateCandidateDescription } from "@/actions/ai"
+import { createCandidate } from "@/actions/candidates"
 import { Form } from "@/components/form"
 import FormBody from "@/components/form/form-body"
 import { FormField } from "@/components/form/form-field"
 import FormFooter from "@/components/form/form-footer"
-import { FormSelect } from "@/components/form/form-select"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
-export default function NewJobPage() {
+export default function NewCandidatePage() {
     const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [phone, setPhone] = useState("")
     const [description, setDescription] = useState("")
-    const [recommendation, setRecommendation] = useState<string[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
-    const [data, dispatch] = useActionState(createJob, {})
+    const [data, dispatch] = useActionState(createCandidate, {})
+
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
     const ACCEPTED_MIME_TYPES = [
@@ -44,8 +44,8 @@ export default function NewJobPage() {
         if (byMime) {
             return true
         }
-        const name = file.name.toLowerCase()
-        return ACCEPTED_EXTENSIONS.some((ext) => name.endsWith(ext))
+        const filename = file.name.toLowerCase()
+        return ACCEPTED_EXTENSIONS.some((ext) => filename.endsWith(ext))
     }
 
     const processFile = async (file: File) => {
@@ -62,7 +62,7 @@ export default function NewJobPage() {
         try {
             const fd = new FormData()
             fd.set("file", file)
-            const result = await generateJobDescription(fd)
+            const result = await generateCandidateDescription(fd)
 
             if (!result.success) {
                 toast.error(result.text, { position: "top-center" })
@@ -72,10 +72,17 @@ export default function NewJobPage() {
 
             const parsed = JSON.parse(
                 result.data.result.alternatives[0].message.text
-            ) as { name: string; description: string; recommendation: string[] }
-            setName(parsed.name)
-            setDescription(parsed.description)
-            setRecommendation(parsed.recommendation)
+            ) as {
+                name: string
+                email: string
+                phone: string
+                description: string
+            }
+
+            setName(parsed.name ?? "")
+            setEmail(parsed.email ?? "")
+            setPhone(parsed.phone.replace(/[^\d]/g, "") ?? "")
+            setDescription(parsed.description ?? "")
         } catch {
             toast.error("Не удалось обработать файл", {
                 position: "top-center",
@@ -120,26 +127,12 @@ export default function NewJobPage() {
             }
             headerDescription={
                 <span>
-                    Информация о вакансии помогает агенту лучше разбираться в
-                    вопросах, связанных с ней. <br />
-                    Опишите как можно подробнее вакансию - требования,
-                    обязанности, опыт, образование, навыки, зарплатные ожидания
-                    и т.д.
+                    Загрузите файл резюме (PDF/DOCX/RTF/TXT), чтобы
+                    автоматически заполнить поля кандидата. Можно перетащить
+                    файл в область формы.
                 </span>
             }
-            headerTitle="Новая вакансия"
-            info={
-                recommendation.length > 0 && (
-                    <>
-                        <h3 className="font-bold">Рекомендации по улучшению</h3>
-                        <ul className="list-disc">
-                            {recommendation.map((item) => (
-                                <li key={item}>{item}</li>
-                            ))}
-                        </ul>
-                    </>
-                )
-            }
+            headerTitle="Новый кандидат"
             isLoading={isLoading}
             onFileDrop={(file) => {
                 processFile(file)
@@ -147,35 +140,42 @@ export default function NewJobPage() {
         >
             <FormBody>
                 <FormField>
-                    <Label
-                        className="shrink-0 basis-3/12"
-                        htmlFor="name"
-                        required
-                    >
-                        Организация
-                    </Label>
-                    <FormSelect
-                        getOptions={getOrganisations}
-                        name="organisationId"
-                    />
-                </FormField>
-                <FormField>
-                    <Label
-                        className="shrink-0 basis-3/12"
-                        htmlFor="name"
-                        required
-                    >
-                        Наименование
+                    <Label className="shrink-0 basis-3/12" htmlFor="name">
+                        Имя
                     </Label>
                     <Input
                         autoComplete="off"
                         name="name"
                         onChange={(e) => setName(e.target.value)}
-                        required
                         type="text"
                         value={name}
                     />
                 </FormField>
+                <FormField>
+                    <Label className="shrink-0 basis-3/12" htmlFor="email">
+                        Email
+                    </Label>
+                    <Input
+                        autoComplete="off"
+                        name="email"
+                        onChange={(e) => setEmail(e.target.value)}
+                        type="email"
+                        value={email}
+                    />
+                </FormField>
+                <FormField>
+                    <Label className="shrink-0 basis-3/12" htmlFor="phone">
+                        Телефон
+                    </Label>
+                    <Input
+                        autoComplete="off"
+                        name="phone"
+                        onChange={(e) => setPhone(e.target.value)}
+                        type="tel"
+                        value={phone}
+                    />
+                </FormField>
+
                 <FormField className="items-start">
                     <Label
                         className="mt-1 shrink-0 basis-3/12"
@@ -184,12 +184,11 @@ export default function NewJobPage() {
                     >
                         Описание
                     </Label>
-
                     <Textarea
                         className="max-h-[328px] min-h-[228px] resize-none"
                         name="description"
                         onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Напишите описание вакансии, чтобы агент имел представление о ней во время разговора"
+                        placeholder="Опишите кандидата"
                         required
                         value={description}
                     />
