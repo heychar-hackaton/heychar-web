@@ -1,8 +1,7 @@
 "use client"
 
 import { IconUpload } from "@tabler/icons-react"
-import { useActionState, useRef, useState } from "react"
-import { toast } from "sonner"
+import { useActionState, useState } from "react"
 import { generateCandidateDescription } from "@/actions/ai"
 import { createCandidate } from "@/actions/candidates"
 import { Form } from "@/components/form"
@@ -13,93 +12,46 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useAIFileImport } from "@/hooks/use-ai-file-import"
 
 export default function NewCandidatePage() {
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [phone, setPhone] = useState("")
     const [description, setDescription] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
 
     const [data, dispatch] = useActionState(createCandidate, {})
-
-    const fileInputRef = useRef<HTMLInputElement | null>(null)
-
-    const ACCEPTED_MIME_TYPES = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "text/plain",
-        "application/rtf",
-        "text/rtf",
-    ] as const
-    const ACCEPTED_EXTENSIONS = [".pdf", ".docx", ".rtf", ".txt"] as const
-
-    const isFileTypeAccepted = (file: File) => {
-        const byMime = file.type
-            ? ACCEPTED_MIME_TYPES.includes(
-                  file.type as (typeof ACCEPTED_MIME_TYPES)[number]
-              )
-            : false
-        if (byMime) {
-            return true
-        }
-        const filename = file.name.toLowerCase()
-        return ACCEPTED_EXTENSIONS.some((ext) => filename.endsWith(ext))
-    }
-
-    const processFile = async (file: File) => {
-        if (!isFileTypeAccepted(file)) {
-            toast.error(
-                "Неподдерживаемый тип файла. Допустимо: PDF, DOCX, RTF, TXT",
-                {
-                    position: "top-center",
-                }
-            )
-            return
-        }
-        setIsLoading(true)
-        try {
-            const fd = new FormData()
-            fd.set("file", file)
-            const result = await generateCandidateDescription(fd)
-
-            if (!result.success) {
-                toast.error(result.text, { position: "top-center" })
-                setIsLoading(false)
-                return
-            }
-
-            const parsed = JSON.parse(
-                result.data.result.alternatives[0].message.text
-            ) as {
-                name: string
-                email: string
-                phone: string
+    const {
+        isLoading,
+        fileInputRef,
+        acceptString,
+        handleFileChange,
+        handleOpenFileDialog,
+        handleFileDrop,
+    } = useAIFileImport({
+        generate: generateCandidateDescription,
+        mapMessageToData: (messageText: string) => {
+            const parsed = JSON.parse(messageText) as {
+                name?: string
+                email?: string
+                phone?: string
                 description: string
             }
-
-            setName(parsed.name ?? "")
-            setEmail(parsed.email ?? "")
-            setPhone(parsed.phone.replace(/[^\d]/g, "") ?? "")
-            setDescription(parsed.description ?? "")
-        } catch {
-            toast.error("Не удалось обработать файл", {
-                position: "top-center",
-            })
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) {
-            return
-        }
-        await processFile(file)
-        e.target.value = ""
-    }
+            return {
+                name: parsed.name ?? "",
+                email: parsed.email ?? "",
+                phone: (parsed.phone ?? "").replace(/[^\d]/g, ""),
+                description: parsed.description ?? "",
+            }
+        },
+        onSuccess: (parsed) => {
+            setName(parsed.name)
+            setEmail(parsed.email)
+            setPhone(parsed.phone)
+            setDescription(parsed.description)
+        },
+        generalErrorMessage: "Не удалось обработать файл",
+    })
 
     return (
         <Form
@@ -108,14 +60,14 @@ export default function NewCandidatePage() {
             headerActions={
                 <>
                     <input
-                        accept=".pdf,.docx,.rtf,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/rtf"
+                        accept={acceptString}
                         className="hidden"
-                        onChange={onFileChange}
+                        onChange={handleFileChange}
                         ref={fileInputRef}
                         type="file"
                     />
                     <Button
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={handleOpenFileDialog}
                         size="sm"
                         type="button"
                         variant="ghost"
@@ -134,9 +86,7 @@ export default function NewCandidatePage() {
             }
             headerTitle="Новый кандидат"
             isLoading={isLoading}
-            onFileDrop={(file) => {
-                processFile(file)
-            }}
+            onFileDrop={handleFileDrop}
         >
             <FormBody>
                 <FormField>

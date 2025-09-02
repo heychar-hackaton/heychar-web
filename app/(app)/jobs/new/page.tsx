@@ -1,8 +1,7 @@
 "use client"
 
 import { IconUpload } from "@tabler/icons-react"
-import { useActionState, useRef, useState } from "react"
-import { toast } from "sonner"
+import { useActionState, useState } from "react"
 import { generateJobDescription } from "@/actions/ai"
 import { createJob } from "@/actions/jobs"
 import { getOrganisations } from "@/actions/organisations"
@@ -15,84 +14,38 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useAIFileImport } from "@/hooks/use-ai-file-import"
 
 export default function NewJobPage() {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [recommendation, setRecommendation] = useState<string[]>([])
-    const [isLoading, setIsLoading] = useState(false)
 
     const [data, dispatch] = useActionState(createJob, {})
-    const fileInputRef = useRef<HTMLInputElement | null>(null)
-
-    const ACCEPTED_MIME_TYPES = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "text/plain",
-        "application/rtf",
-        "text/rtf",
-    ] as const
-    const ACCEPTED_EXTENSIONS = [".pdf", ".docx", ".rtf", ".txt"] as const
-
-    const isFileTypeAccepted = (file: File) => {
-        const byMime = file.type
-            ? ACCEPTED_MIME_TYPES.includes(
-                  file.type as (typeof ACCEPTED_MIME_TYPES)[number]
-              )
-            : false
-        if (byMime) {
-            return true
-        }
-        const name = file.name.toLowerCase()
-        return ACCEPTED_EXTENSIONS.some((ext) => name.endsWith(ext))
-    }
-
-    const processFile = async (file: File) => {
-        if (!isFileTypeAccepted(file)) {
-            toast.error(
-                "Неподдерживаемый тип файла. Допустимо: PDF, DOCX, RTF, TXT",
-                {
-                    position: "top-center",
-                }
-            )
-            return
-        }
-        setIsLoading(true)
-        try {
-            const fd = new FormData()
-            fd.set("file", file)
-            const result = await generateJobDescription(fd)
-
-            if (!result.success) {
-                toast.error(result.text, { position: "top-center" })
-                setIsLoading(false)
-                return
+    const {
+        isLoading,
+        fileInputRef,
+        acceptString,
+        handleFileChange,
+        handleOpenFileDialog,
+        handleFileDrop,
+    } = useAIFileImport({
+        generate: generateJobDescription,
+        mapMessageToData: (messageText: string) => {
+            const parsed = JSON.parse(messageText) as {
+                name: string
+                description: string
+                recommendation: string[]
             }
-
-            const parsed = JSON.parse(
-                result.data.result.alternatives[0].message.text
-            ) as { name: string; description: string; recommendation: string[] }
+            return parsed
+        },
+        onSuccess: (parsed) => {
             setName(parsed.name)
             setDescription(parsed.description)
             setRecommendation(parsed.recommendation)
-        } catch {
-            toast.error("Не удалось обработать файл", {
-                position: "top-center",
-            })
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) {
-            return
-        }
-        await processFile(file)
-        e.target.value = ""
-    }
+        },
+        generalErrorMessage: "Не удалось обработать файл",
+    })
 
     return (
         <Form
@@ -101,14 +54,14 @@ export default function NewJobPage() {
             headerActions={
                 <>
                     <input
-                        accept=".pdf,.docx,.rtf,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/rtf"
+                        accept={acceptString}
                         className="hidden"
-                        onChange={onFileChange}
+                        onChange={handleFileChange}
                         ref={fileInputRef}
                         type="file"
                     />
                     <Button
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={handleOpenFileDialog}
                         size="sm"
                         type="button"
                         variant="ghost"
@@ -141,9 +94,7 @@ export default function NewJobPage() {
                 )
             }
             isLoading={isLoading}
-            onFileDrop={(file) => {
-                processFile(file)
-            }}
+            onFileDrop={handleFileDrop}
         >
             <FormBody>
                 <FormField>

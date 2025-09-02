@@ -131,14 +131,20 @@ const Form = React.forwardRef<HTMLFormElement, FormProps>(
                         )}
 
                         {errors && (
-                            <div className="flex gap-2 rounded-md p-3 text-destructive ring-1 ring-destructive">
+                            <div className="flex gap-2 rounded-md bg-gradient-to-br from-background via-destructive/5 to-destructive/15 p-3 text-destructive ring-1 ring-destructive">
                                 <CircleExclamationFill className="h-4 w-4 shrink-0" />
                                 <div className="text-sm">
-                                    {errors.map((item) => (
-                                        <div className="break-words" key={item}>
-                                            - {item}
-                                        </div>
-                                    ))}
+                                    <h3 className="font-bold">Ошибки</h3>
+                                    <ul className="list-disc">
+                                        {errors.map((item) => (
+                                            <li
+                                                className="break-words"
+                                                key={item}
+                                            >
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             </div>
                         )}
