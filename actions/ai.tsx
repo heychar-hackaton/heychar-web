@@ -2,11 +2,33 @@
 
 import { toJSONSchema, z } from "zod"
 import { getTextFromFile } from "@/lib/file-parser"
+import { yandexComplete, type YandexCompletionRequest } from "@/lib/yandex"
 
-const YC_TOKEN = process.env.YANDEX_API_KEY
-const YC_FOLDER_ID = process.env.YANDEX_FOLDER_ID
+type YandexTextResult = {
+    result: {
+        alternatives: { message: { text: string } }[]
+    }
+}
 
-export const generateJobDescription = async (formData: FormData) => {
+type GenerateJobDescriptionSuccess = {
+    success: true
+    data: YandexTextResult
+    text: string
+}
+
+type GenerateJobDescriptionError = {
+    success: false
+    data: string | null
+    text: string
+}
+
+export type GenerateJobDescriptionResponse =
+    | GenerateJobDescriptionSuccess
+    | GenerateJobDescriptionError
+
+export const generateJobDescription = async (
+    formData: FormData
+): Promise<GenerateJobDescriptionResponse> => {
     const file = formData.get("file") as File | null
 
     if (!file) {
@@ -21,7 +43,8 @@ export const generateJobDescription = async (formData: FormData) => {
 
     if (!data.success) {
         return {
-            ...data,
+            success: false,
+            text: data.text,
             data: null,
         }
     }
@@ -31,7 +54,7 @@ export const generateJobDescription = async (formData: FormData) => {
         recommendation: z.array(z.string()),
     })
 
-    const requestBody = {
+    const requestBody: YandexCompletionRequest = {
         messages: [
             {
                 role: "system",
@@ -57,7 +80,6 @@ export const generateJobDescription = async (formData: FormData) => {
         ${data.text}`,
             },
         ],
-        modelUri: `gpt://${YC_FOLDER_ID}/yandexgpt/latest`,
         completionOptions: {
             stream: false,
         },
@@ -67,27 +89,17 @@ export const generateJobDescription = async (formData: FormData) => {
         },
     }
 
-    const response = await fetch(
-        "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${YC_TOKEN}`,
-            },
-            body: JSON.stringify(requestBody),
-        }
-    )
+    const response = await yandexComplete<YandexTextResult>(requestBody)
 
     if (!response.ok) {
         return {
             success: false,
             text: "Не удалось сгенерировать вакансию",
-            data: await response.text(),
+            data: response.error,
         }
     }
 
-    const result = await response.json()
+    const result = response.data
 
     return {
         success: true,
