@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import { db } from '@/db';
-import { candidates, jobs, organisations } from '@/db/data';
+import { candidates, jobs, organisations, skills } from '@/db/data';
 import type { FormResult } from '@/lib/types';
 import { formError } from '@/lib/utils';
 
@@ -82,7 +82,21 @@ export const getCandidateById = async (id: string) => {
     return null;
   }
 
-  return candidate[0];
+  // Получаем скиллы кандидата
+  const candidateSkills = await db
+    .select({
+      id: skills.id,
+      name: skills.name,
+      type: skills.type,
+      value: skills.value,
+    })
+    .from(skills)
+    .where(eq(skills.candidateId, id));
+
+  return {
+    ...candidate[0],
+    skills: candidateSkills,
+  };
 };
 
 const candidateFieldsSchema = z.object({

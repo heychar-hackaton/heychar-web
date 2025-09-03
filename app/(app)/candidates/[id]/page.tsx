@@ -15,18 +15,5 @@ export default async function Page(props: PageProps<"/candidates/[id]">) {
         notFound()
     }
 
-    return (
-        <EditCandidateForm
-            candidate={{
-                id: candidate.id,
-                name: candidate.name,
-                email: candidate.email,
-                phone: candidate.phone,
-                description: candidate.description,
-                createdAt: candidate.createdAt,
-                job: candidate.job,
-                archived: candidate.archived,
-            }}
-        />
-    )
+    return <EditCandidateForm candidate={candidate} />
 }
