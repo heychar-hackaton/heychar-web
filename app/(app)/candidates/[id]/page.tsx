@@ -17,11 +17,12 @@ export default async function Page({ params }: { params: { id: string } }) {
         <EditCandidateForm
             candidate={{
                 id: candidate.id,
-                email: candidate.email ?? null,
-                phone: candidate.phone ?? null,
-                resumeUrl: candidate.resumeUrl ?? null,
-                summary: candidate.summary ?? null,
-                description: candidate.description ?? null,
+                name: candidate.name,
+                email: candidate.email,
+                phone: candidate.phone,
+                description: candidate.description,
+                createdAt: candidate.createdAt,
+                job: null,
             }}
         />
     )

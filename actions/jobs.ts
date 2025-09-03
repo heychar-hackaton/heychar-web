@@ -20,6 +20,7 @@ export const getJobs = async () => {
       name: jobs.name,
       description: jobs.description,
       archived: jobs.archived,
+      createdAt: jobs.createdAt,
       organisation: {
         id: organisations.id,
         name: organisations.name,

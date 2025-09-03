@@ -50,6 +50,13 @@
       "when": 1756876277494,
       "tag": "0006_numerous_millenium_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1756908312229,
+      "tag": "0007_common_kabuki",
+      "breakpoints": true
     }
   ]
 }

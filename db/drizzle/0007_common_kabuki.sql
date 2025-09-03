@@ -1,0 +1,2 @@
+ALTER TABLE "candidates" ADD COLUMN "created_at" timestamp with time zone DEFAULT now() NOT NULL;--> statement-breakpoint
+ALTER TABLE "jobs" ADD COLUMN "created_at" timestamp with time zone DEFAULT now() NOT NULL;

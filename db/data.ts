@@ -49,6 +49,9 @@ export const jobs = pgTable('jobs', {
     onDelete: 'cascade',
   }),
   archived: boolean('archived').default(false).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
+    .defaultNow()
+    .notNull(),
 });
 
 export const candidates = pgTable('candidates', {
@@ -60,6 +63,9 @@ export const candidates = pgTable('candidates', {
   name: text('name'),
   email: text('email'),
   phone: text('phone'),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
+    .defaultNow()
+    .notNull(),
 });
 
 export const interviews = pgTable('interviews', {

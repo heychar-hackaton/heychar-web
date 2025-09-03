@@ -22,6 +22,7 @@ export const getCandidates = async () => {
       email: candidates.email,
       phone: candidates.phone,
       description: candidates.description,
+      createdAt: candidates.createdAt,
       job: {
         id: jobs.id,
         name: jobs.name,
@@ -56,6 +57,7 @@ export const getCandidateById = async (id: string) => {
       phone: candidates.phone,
       description: candidates.description,
       jobId: candidates.jobId,
+      createdAt: candidates.createdAt,
     })
     .from(candidates)
     .leftJoin(jobs, eq(candidates.jobId, jobs.id))
