@@ -7,7 +7,8 @@ export const metadata: Metadata = {
     title: "Редактирование вакансии",
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page(props: PageProps<"/jobs/[id]">) {
+    const params = await props.params
     const job = await getJobById(params.id)
     if (!job) {
         notFound()
