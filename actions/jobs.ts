@@ -19,6 +19,7 @@ export const getJobs = async () => {
       id: jobs.id,
       name: jobs.name,
       description: jobs.description,
+      archived: jobs.archived,
       organisation: {
         id: organisations.id,
         name: organisations.name,
@@ -41,17 +42,19 @@ export const getJobById = async (id: string) => {
     return null;
   }
   // ensure job belongs to current user via its organisation
-  if (job.organisationId) {
-    const org = await db.query.organisations.findFirst({
-      where: eq(organisations.id, job.organisationId),
-    });
-    if (!org || org.userId !== (session.user.id as string)) {
-      return null;
-    }
-  } else {
+
+  if (!job.organisationId) {
     return null;
   }
-  return job;
+
+  const org = await db.query.organisations.findFirst({
+    where: eq(organisations.id, job.organisationId),
+  });
+  if (!org || org.userId !== (session.user.id as string)) {
+    return null;
+  }
+
+  return { ...job, organisation: org };
 };
 
 export const createJob = async (
@@ -100,6 +103,7 @@ const updateJobSchema = z.object({
   organisationId: z.string().min(1, 'Организация обязательна'),
   name: z.string().nonempty('Наименование не может быть пустым'),
   description: z.string().nonempty('Описание вакансии не может быть пустым'),
+  archived: z.boolean(),
 });
 
 export const updateJob = async (
@@ -110,12 +114,13 @@ export const updateJob = async (
   const organisationId = (formData.get('organisationId') as string) ?? '';
   const name = (formData.get('name') as string) ?? '';
   const description = (formData.get('description') as string) ?? '';
-
+  const archived = (formData.get('archived') as string) === 'on';
   const parsed = updateJobSchema.safeParse({
     id,
     organisationId,
     name,
     description,
+    archived,
   });
   if (!parsed.success) {
     return formError(parsed.error.issues);
@@ -148,7 +153,7 @@ export const updateJob = async (
 
   await db
     .update(jobs)
-    .set({ name, description, organisationId })
+    .set({ name, description, organisationId, archived })
     .where(eq(jobs.id, id));
 
   redirect('/jobs');

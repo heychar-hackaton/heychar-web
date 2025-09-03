@@ -1,50 +1,62 @@
 "use client"
 
-import useColumns from "@/hooks/use-columns"
-import { DataTable } from "@/components/ui/data-table"
-import { useRouter } from "next/navigation"
-import { TJob } from "@/db/types"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { IconPlus } from "@tabler/icons-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { DataTable } from "@/components/ui/data-table"
+import type { TJob } from "@/db/types"
+import useColumns from "@/hooks/use-columns"
 
 export const JobList = ({ jobs }: { jobs: TJob[] }) => {
-  const router = useRouter()
-  const columns = useColumns<TJob>(
-    {
-      columns: [
+    const router = useRouter()
+    const columns = useColumns<TJob>(
         {
-          accessorKey: "name",
-          header: "Наименование",
+            columns: [
+                {
+                    accessorKey: "name",
+                    header: "Наименование",
+                },
+                {
+                    accessorKey: "organisation.name",
+                    header: "Организация",
+                },
+                {
+                    accessorKey: "archived",
+                    header: "Статус",
+                    cell: ({ row }) => {
+                        return row.original.archived ? (
+                            <Badge variant="destructive">Закрыта</Badge>
+                        ) : (
+                            <Badge variant="default">Активна</Badge>
+                        )
+                    },
+                },
+            ],
+            hideSelection: true,
         },
-        {
-          accessorKey: "organisation.name",
-          header: "Организация",
-        },
-      ],
-      hideSelection: true,
-    },
-    []
-  )
+        []
+    )
 
-  return (
-    <div>
-      <DataTable
-        columns={columns}
-        data={jobs}
-        actions={() => (
-          <Link href={"/jobs/new"}>
-            <Button size={"sm"}>
-              <IconPlus className="size-4" />
-              Добавить
-            </Button>
-          </Link>
-        )}
-        onRowClick={(row) => {
-          router.push(`/jobs/${row.original.id}`)
-        }}
-        rowClassName="cursor-pointer"
-      />
-    </div>
-  )
+    return (
+        <div>
+            <DataTable
+                actions={() => (
+                    <Link href={"/jobs/new"}>
+                        <Button size={"sm"}>
+                            <IconPlus className="size-4" />
+                            Добавить
+                        </Button>
+                    </Link>
+                )}
+                columns={columns}
+                data={jobs}
+                onRowClick={(row) => {
+                    router.push(`/jobs/${row.original.id}`)
+                }}
+                rowClassName="cursor-pointer"
+            />
+        </div>
+    )
 }
