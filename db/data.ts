@@ -56,6 +56,7 @@ export const candidates = pgTable('candidates', {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   description: text('description'),
+  jobId: text('job_id').references(() => jobs.id, { onDelete: 'set null' }),
   name: text('name'),
   email: text('email'),
   phone: text('phone'),
@@ -126,7 +127,8 @@ export const jobsRelations = relations(jobs, ({ one, many }) => ({
   interviews: many(interviews),
 }));
 
-export const candidatesRelations = relations(candidates, ({ many }) => ({
+export const candidatesRelations = relations(candidates, ({ one, many }) => ({
+  job: one(jobs, { fields: [candidates.jobId], references: [jobs.id] }),
   interviews: many(interviews),
   skills: many(skills),
 }));

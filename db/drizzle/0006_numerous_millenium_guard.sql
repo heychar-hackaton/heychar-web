@@ -1,0 +1,2 @@
+ALTER TABLE "candidates" ADD COLUMN "job_id" text;--> statement-breakpoint
+ALTER TABLE "candidates" ADD CONSTRAINT "candidates_job_id_jobs_id_fk" FOREIGN KEY ("job_id") REFERENCES "public"."jobs"("id") ON DELETE set null ON UPDATE no action;

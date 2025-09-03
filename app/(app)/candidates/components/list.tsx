@@ -16,17 +16,45 @@ export const CandidateList = ({ candidates }: { candidates: TCandidate[] }) => {
                 {
                     accessorKey: "email",
                     header: "Email",
+                    cell: ({ row }) => {
+                        return row.original.email ? (
+                            row.original.email
+                        ) : (
+                            <span className="text-muted-foreground">
+                                Не указан
+                            </span>
+                        )
+                    },
                 },
                 {
                     accessorKey: "phone",
                     header: "Телефон",
+                    cell: ({ row }) => {
+                        return row.original.phone ? (
+                            row.original.phone
+                        ) : (
+                            <span className="text-muted-foreground">
+                                Не указан
+                            </span>
+                        )
+                    },
                 },
                 {
                     accessorKey: "name",
                     header: "Имя",
                     cell: ({ row }) => {
-                        return row.original.name || "Без имени"
+                        return row.original.name ? (
+                            row.original.name
+                        ) : (
+                            <span className="text-muted-foreground">
+                                Не указано
+                            </span>
+                        )
                     },
+                },
+                {
+                    accessorKey: "job.name",
+                    header: "Вакансия",
                 },
             ],
             hideSelection: true,

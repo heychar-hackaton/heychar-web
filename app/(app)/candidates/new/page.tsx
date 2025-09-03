@@ -4,10 +4,12 @@ import { IconUpload } from "@tabler/icons-react"
 import { useActionState, useState } from "react"
 import { generateCandidateDescription } from "@/actions/ai"
 import { createCandidate } from "@/actions/candidates"
+import { getJobs } from "@/actions/jobs"
 import { Form } from "@/components/form"
 import FormBody from "@/components/form/form-body"
 import { FormField } from "@/components/form/form-field"
 import FormFooter from "@/components/form/form-footer"
+import { FormSelect } from "@/components/form/form-select"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,7 +21,7 @@ export default function NewCandidatePage() {
     const [email, setEmail] = useState("")
     const [phone, setPhone] = useState("")
     const [description, setDescription] = useState("")
-
+    const [jobId, setJobId] = useState("")
     const [data, dispatch] = useActionState(createCandidate, {})
     const {
         isLoading,
@@ -36,12 +38,14 @@ export default function NewCandidatePage() {
                 email?: string
                 phone?: string
                 description: string
+                jobId?: string
             }
             return {
                 name: parsed.name ?? "",
                 email: parsed.email ?? "",
                 phone: (parsed.phone ?? "").replace(/[^\d]/g, ""),
                 description: parsed.description ?? "",
+                jobId: parsed.jobId ?? "",
             }
         },
         onSuccess: (parsed) => {
@@ -49,6 +53,7 @@ export default function NewCandidatePage() {
             setEmail(parsed.email)
             setPhone(parsed.phone)
             setDescription(parsed.description)
+            setJobId(parsed.jobId)
         },
         generalErrorMessage: "Не удалось обработать файл",
     })
@@ -89,6 +94,21 @@ export default function NewCandidatePage() {
             onFileDrop={handleFileDrop}
         >
             <FormBody>
+                <FormField>
+                    <Label
+                        className="shrink-0 basis-3/12"
+                        htmlFor="jobId"
+                        required
+                    >
+                        Вакансия
+                    </Label>
+                    <FormSelect
+                        getOptions={getJobs}
+                        name="jobId"
+                        onValueChange={(value) => setJobId(value)}
+                        value={jobId}
+                    />
+                </FormField>
                 <FormField>
                     <Label className="shrink-0 basis-3/12" htmlFor="name">
                         Имя

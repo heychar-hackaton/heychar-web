@@ -3,6 +3,7 @@
 import { toJSONSchema, z } from "zod"
 import { getTextFromFile } from "@/lib/file-parser"
 import { type YandexCompletionRequest, yandexComplete } from "@/lib/yandex"
+import { getJobs } from "./jobs"
 
 type YandexTextResult = {
     result: {
@@ -130,10 +131,14 @@ export const generateCandidateDescription = async (
             data: null,
         }
     }
+
+    const jobs = await getJobs()
+
     const jsonSchema = z.object({
         name: z.string().optional().default(""),
         email: z.string().optional().default(""),
         phone: z.string().optional().default(""),
+        jobId: z.string().optional().default(""),
         description: z.string(),
     })
 
@@ -155,6 +160,20 @@ export const generateCandidateDescription = async (
         Поле email - это email кандидата, если нет, то пустая строка.
         Поле phone - это телефон кандидата, если нет, то пустая строка.
         Поле description - это описание из резюме. Только текст без markdown-разметки, разбитый по разделам - параграфам.
+        Поле jobId - это id вакансии, если нет, то пустая строка.
+
+        По информации о резюме попробуй найти для нее подходящую вакансию из списка: 
+        ${jobs
+            .map((job) =>
+                JSON.stringify({
+                    name: job.name,
+                    id: job.id,
+                })
+            )
+            .join("\n")}
+
+        Если найдешь, то верни id этой вакансии.
+        
         Разделы всегда должны быть разделены пустой строкой.
         Выяви опыт работы, места работы, должности, обязанности, результаты работы, навыки, образования, место жительства, возможность переезда.
         
