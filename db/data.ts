@@ -63,6 +63,7 @@ export const candidates = pgTable('candidates', {
   name: text('name'),
   email: text('email'),
   phone: text('phone'),
+  archived: boolean('archived').default(false).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
     .defaultNow()
     .notNull(),

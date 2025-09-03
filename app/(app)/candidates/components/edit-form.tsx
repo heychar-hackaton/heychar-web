@@ -2,10 +2,13 @@
 
 import { useActionState } from "react"
 import { updateCandidate } from "@/actions/candidates"
+import { getJobs } from "@/actions/jobs"
 import { Form } from "@/components/form"
 import FormBody from "@/components/form/form-body"
 import { FormField } from "@/components/form/form-field"
 import FormFooter from "@/components/form/form-footer"
+import { FormSelect } from "@/components/form/form-select"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -22,6 +25,20 @@ export function EditCandidateForm({ candidate }: { candidate: TCandidate }) {
         >
             <FormBody>
                 <input name="id" type="hidden" value={candidate.id} />
+                <FormField>
+                    <Label
+                        className="shrink-0 basis-3/12"
+                        htmlFor="jobId"
+                        required
+                    >
+                        Вакансия
+                    </Label>
+                    <FormSelect
+                        defaultValue={candidate.job?.id ?? undefined}
+                        getOptions={getJobs}
+                        name="jobId"
+                    />
+                </FormField>
                 <FormField>
                     <Label className="shrink-0 basis-3/12" htmlFor="name">
                         Имя
@@ -68,6 +85,15 @@ export function EditCandidateForm({ candidate }: { candidate: TCandidate }) {
                         defaultValue={candidate.description ?? ""}
                         name="description"
                         placeholder="Опишите кандидата"
+                    />
+                </FormField>
+                <FormField>
+                    <Label className="shrink-0 basis-3/12" htmlFor="archived">
+                        В архиве
+                    </Label>
+                    <Checkbox
+                        defaultChecked={candidate.archived}
+                        name="archived"
                     />
                 </FormField>
             </FormBody>

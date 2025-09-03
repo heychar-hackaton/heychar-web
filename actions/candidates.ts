@@ -23,6 +23,7 @@ export const getCandidates = async () => {
       phone: candidates.phone,
       description: candidates.description,
       createdAt: candidates.createdAt,
+      archived: candidates.archived,
       job: {
         id: jobs.id,
         name: jobs.name,
@@ -56,7 +57,11 @@ export const getCandidateById = async (id: string) => {
       email: candidates.email,
       phone: candidates.phone,
       description: candidates.description,
-      jobId: candidates.jobId,
+      job: {
+        id: jobs.id,
+        name: jobs.name,
+      },
+      archived: candidates.archived,
       createdAt: candidates.createdAt,
     })
     .from(candidates)
@@ -86,6 +91,7 @@ const candidateFieldsSchema = z.object({
   phone: z.string().or(z.literal('')),
   jobId: z.string().min(1, 'Вакансия обязательна'),
   description: z.string().min(1, 'Описание обязательно'),
+  archived: z.boolean(),
 });
 
 const candidateBaseSchema = candidateFieldsSchema.refine(
@@ -134,7 +140,7 @@ export const createCandidate = async (
 };
 
 const updateCandidateSchema = candidateFieldsSchema
-  .extend({ id: z.string().min(1) })
+  .extend({ id: z.string().min(1), archived: z.boolean() })
   .refine((val) => val.email !== '' || val.phone !== '', {
     message: 'Укажите email или телефон',
     path: ['email'],
@@ -150,6 +156,7 @@ export const updateCandidate = async (
   const phone = (formData.get('phone') as string) ?? '';
   const jobId = (formData.get('jobId') as string) ?? '';
   const description = (formData.get('description') as string) ?? '';
+  const archived = (formData.get('archived') as string) === 'on';
 
   const parsed = updateCandidateSchema.safeParse({
     id,
@@ -158,6 +165,7 @@ export const updateCandidate = async (
     phone,
     jobId,
     description,
+    archived,
   });
   if (!parsed.success) {
     return formError(parsed.error.issues);
@@ -198,6 +206,7 @@ export const updateCandidate = async (
       phone: parsed.data.phone || null,
       jobId: parsed.data.jobId || null,
       description: parsed.data.description || null,
+      archived: parsed.data.archived,
     })
     .where(eq(candidates.id, parsed.data.id));
 

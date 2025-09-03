@@ -22,7 +22,8 @@ export default async function Page({ params }: { params: { id: string } }) {
                 phone: candidate.phone,
                 description: candidate.description,
                 createdAt: candidate.createdAt,
-                job: null,
+                job: candidate.job,
+                archived: candidate.archived,
             }}
         />
     )

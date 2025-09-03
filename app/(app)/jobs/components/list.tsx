@@ -27,7 +27,7 @@ export const JobList = ({ jobs }: { jobs: TJob[] }) => {
                     header: "Статус",
                     cell: ({ row }) => {
                         return row.original.archived ? (
-                            <Badge variant="destructive">Закрыта</Badge>
+                            <Badge variant="destructive">В архиве</Badge>
                         ) : (
                             <Badge variant="default">Активна</Badge>
                         )

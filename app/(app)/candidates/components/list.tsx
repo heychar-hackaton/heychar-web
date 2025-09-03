@@ -3,6 +3,7 @@
 import { IconPlus } from "@tabler/icons-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
 import type { TCandidate } from "@/db/types"
@@ -55,6 +56,17 @@ export const CandidateList = ({ candidates }: { candidates: TCandidate[] }) => {
                 {
                     accessorKey: "job.name",
                     header: "Вакансия",
+                },
+                {
+                    accessorKey: "archived",
+                    header: "Статус",
+                    cell: ({ row }) => {
+                        return row.original.archived ? (
+                            <Badge variant="destructive">В архиве</Badge>
+                        ) : (
+                            <Badge variant="default">Активен</Badge>
+                        )
+                    },
                 },
             ],
             hideSelection: true,
