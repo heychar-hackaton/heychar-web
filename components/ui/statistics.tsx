@@ -9,7 +9,7 @@ const Statistics = ({
 }) => {
     return (
         <div className="flex flex-col">
-            <span className="font-semibold text-3xl">{value}</span>
+            {!!value && <span className="font-semibold text-3xl">{value}</span>}
             <span className="text-muted-foreground text-sm">{description}</span>
         </div>
     )
