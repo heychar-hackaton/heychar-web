@@ -1,10 +1,18 @@
-import type { Metadata } from 'next';
-import { WIP } from '@/components/ui/wip';
+import type { Metadata } from "next"
+import { getInterviews } from "@/actions/interviews"
+import { EmptyInterviewsState } from "./components/empty-state"
+import { InterviewList } from "./components/list"
 
 export const metadata: Metadata = {
-  title: 'Собеседования',
-};
+    title: "Собеседования",
+}
 
-export default function Page() {
-  return <WIP />;
+export default async function Page() {
+    const interviews = await getInterviews()
+
+    if (interviews.length === 0) {
+        return <EmptyInterviewsState />
+    }
+
+    return <InterviewList interviews={interviews} />
 }
