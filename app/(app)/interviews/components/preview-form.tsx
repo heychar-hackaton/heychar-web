@@ -2,6 +2,8 @@ import { IconBriefcaseFilled, IconUserFilled } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { TInterviewInfo } from "@/db/types"
 
 const getSkillVariant = (skillValue: number) => {
@@ -38,7 +40,7 @@ export const PreviewForm = ({ interview }: { interview: TInterviewInfo }) => {
                     <div className="flex aspect-square w-12 items-center justify-center rounded-xl bg-gradient-to-br from-foreground via-foreground/80 to-foreground/60 text-background transition-colors hover:via-foreground/60">
                         <IconUserFilled className="size-6" />
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
                         <h3 className="font-bold text-xl leading-none">
                             {interview.candidate?.name}
                         </h3>
@@ -82,7 +84,7 @@ export const PreviewForm = ({ interview }: { interview: TInterviewInfo }) => {
                         <div className="flex aspect-square w-12 items-center justify-center rounded-xl bg-gradient-to-br from-foreground via-foreground/80 to-foreground/60 text-background transition-colors hover:via-foreground/60">
                             <IconBriefcaseFilled className="size-6" />
                         </div>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-1">
                             <h3 className="font-bold text-xl leading-none">
                                 {interview.job?.name}
                             </h3>
@@ -108,6 +110,38 @@ export const PreviewForm = ({ interview }: { interview: TInterviewInfo }) => {
                         {Number(interview.matchPercentage)?.toFixed(0)}
                     </Badge>
                 </div>
+
+                <Tabs className="mt-6 w-full" defaultValue="recommendation">
+                    <TabsList className="w-full">
+                        <TabsTrigger value="recommendation">Резюме</TabsTrigger>
+                        <TabsTrigger value="chat">Диалог</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="recommendation">
+                        {interview.recommendation && (
+                            <div className="mt-4">
+                                <p className="font-medium text-sm">
+                                    Резюме: {interview.recommendation}
+                                </p>
+                            </div>
+                        )}
+                        {interview.summary && (
+                            <div className="mt-4">
+                                <p className="font-medium text-sm">
+                                    Резюме: {interview.summary}
+                                </p>
+                            </div>
+                        )}
+                    </TabsContent>
+                    <TabsContent value="chat">
+                        {interview.messages?.map((message, index) => (
+                            <div key={index}>
+                                <p>{message.role}</p>
+                                <p>{message.content}</p>
+                                <Separator className="my-6 bg-border/40" />
+                            </div>
+                        ))}
+                    </TabsContent>
+                </Tabs>
             </div>
         </div>
     )
