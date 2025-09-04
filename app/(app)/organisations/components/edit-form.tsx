@@ -1,25 +1,25 @@
-"use client"
+'use client';
 
-import { useActionState } from "react"
-import { updateOrganisation } from "@/actions/organisations"
-import { Form } from "@/components/form"
-import FormBody from "@/components/form/form-body"
-import { FormField } from "@/components/form/form-field"
-import FormFooter from "@/components/form/form-footer"
-import FormSegmentHeader from "@/components/form/form-segment-header"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { useActionState } from 'react';
+import { updateOrganisation } from '@/actions/organisations';
+import { Form } from '@/components/form';
+import FormBody from '@/components/form/form-body';
+import { FormField } from '@/components/form/form-field';
+import FormFooter from '@/components/form/form-footer';
+import FormSegmentHeader from '@/components/form/form-segment-header';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 type Organisation = {
-  id: string
-  name: string
-  description: string | null
-}
+  id: string;
+  name: string;
+  description: string | null;
+};
 
 export function EditOrganisationForm({ org }: { org: Organisation }) {
-  const [data, dispatch] = useActionState(updateOrganisation, {})
+  const [data, dispatch] = useActionState(updateOrganisation, {});
 
   return (
     <Form
@@ -51,7 +51,7 @@ export function EditOrganisationForm({ org }: { org: Organisation }) {
           </Label>
           <Textarea
             className="max-h-[328px] min-h-[228px] resize-none"
-            defaultValue={org.description ?? ""}
+            defaultValue={org.description ?? ''}
             name="description"
             placeholder="Опишите организацию"
             required
@@ -95,5 +95,5 @@ export function EditOrganisationForm({ org }: { org: Organisation }) {
       </FormBody>
       <FormFooter cancelLabel="Назад" submitLabel="Сохранить" />
     </Form>
-  )
+  );
 }

@@ -1,6 +1,6 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { auth } from '@/auth';
@@ -9,7 +9,7 @@ import { jobs, organisations } from '@/db/data';
 import type { FormResult } from '@/lib/types';
 import { formError } from '@/lib/utils';
 
-export const getJobs = async () => {
+export const getJobs = async (activeOnly = true) => {
   const session = await auth();
   if (!session?.user) {
     throw new Error('Unauthorized');
@@ -28,7 +28,12 @@ export const getJobs = async () => {
     })
     .from(jobs)
     .leftJoin(organisations, eq(jobs.organisationId, organisations.id))
-    .where(eq(organisations.userId, session.user.id as string));
+    .where(
+      and(
+        eq(organisations.userId, session.user.id as string),
+        activeOnly ? eq(jobs.archived, false) : undefined
+      )
+    );
 
   return jobsList;
 };

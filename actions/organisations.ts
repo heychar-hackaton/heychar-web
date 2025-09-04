@@ -107,9 +107,7 @@ export const createOrganisation = async (
 const updateSchema = z.object({
   id: z.string().min(1),
   name: z.string().nonempty('Имя организации не может быть пустым'),
-  description: z
-    .string()
-    .nonempty('Описание организации не может быть пустым'),
+  description: z.string().nonempty('Описание организации не может быть пустым'),
   yandexApiKey: z.string().trim().optional(),
   yandexFolderId: z.string().trim().optional(),
 });

@@ -1,6 +1,6 @@
-import { IconPlus } from "@tabler/icons-react"
-import EmptyAdd from "@/components/illustrations/empty-add"
-import { EmptyState } from "@/components/ui/empty-state"
+import { IconPlus } from '@tabler/icons-react';
+import EmptyAdd from '@/components/illustrations/empty-add';
+import { EmptyState } from '@/components/ui/empty-state';
 
 export const EmptyJobsState = () => {
   return (
@@ -9,10 +9,10 @@ export const EmptyJobsState = () => {
       illustration={<EmptyAdd />}
       mainAction={{
         icon: <IconPlus className="size-4" />,
-        title: "Создать",
-        link: "/jobs/new",
+        title: 'Создать',
+        link: '/jobs/new',
       }}
       title="Нет вакансий"
     />
-  )
-}
+  );
+};

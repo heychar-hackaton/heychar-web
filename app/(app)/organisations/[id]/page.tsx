@@ -1,18 +1,18 @@
-import type { Metadata } from "next"
-import { notFound } from "next/navigation"
-import { getOrganisationById } from "@/actions/organisations"
-import { EditOrganisationForm } from "../components/edit-form"
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getOrganisationById } from '@/actions/organisations';
+import { EditOrganisationForm } from '../components/edit-form';
 
 export const metadata: Metadata = {
-    title: "Редактирование",
-}
+  title: 'Редактирование',
+};
 
-export default async function Page(props: PageProps<"/organisations/[id]">) {
-    const params = await props.params
-    const organisation = await getOrganisationById(params.id)
-    if (!organisation) {
-        notFound()
-    }
+export default async function Page(props: PageProps<'/organisations/[id]'>) {
+  const params = await props.params;
+  const organisation = await getOrganisationById(params.id);
+  if (!organisation) {
+    notFound();
+  }
 
-    return <EditOrganisationForm org={organisation} />
+  return <EditOrganisationForm org={organisation} />;
 }

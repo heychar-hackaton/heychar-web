@@ -4,15 +4,15 @@ import { EmptyJobsState } from "./components/empty-state"
 import { JobList } from "./components/list"
 
 export const metadata: Metadata = {
-  title: "Вакансии",
+    title: "Вакансии",
 }
 
 export default async function Page() {
-  const jobs = await getJobs()
+    const jobs = await getJobs(false)
 
-  if (!jobs.length) {
-    return <EmptyJobsState />
-  }
+    if (!jobs.length) {
+        return <EmptyJobsState />
+    }
 
-  return <JobList jobs={jobs} />
+    return <JobList jobs={jobs} />
 }
