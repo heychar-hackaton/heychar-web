@@ -1,9 +1,9 @@
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import type { getCandidateById, getCandidates } from '@/actions/candidates';
-import type { getInterviews } from '@/actions/interviews';
+import type { getInterviewById, getInterviews } from '@/actions/interviews';
 import type { getJobs } from '@/actions/jobs';
 import type { users } from './auth';
-import type { interviews, organisations, skills } from './data';
+import type { organisations, skills } from './data';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -27,7 +27,9 @@ export type TCandidateInfo = NonNullable<
 export type TInterview = ArrayElement<
   Awaited<ReturnType<typeof getInterviews>>
 >;
-export type TNewInterview = InferInsertModel<typeof interviews>;
+export type TInterviewInfo = NonNullable<
+  Awaited<ReturnType<typeof getInterviewById>>
+>;
 
 export type TSkill = InferSelectModel<typeof skills>;
 export type TNewSkill = InferInsertModel<typeof skills>;
