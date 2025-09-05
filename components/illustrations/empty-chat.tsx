@@ -198,3 +198,4 @@ export const EmptyChat: React.FC<EmptyChatProps> = ({
 };
 
 export default EmptyChat;
+

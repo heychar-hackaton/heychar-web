@@ -3,7 +3,11 @@ import type { getCandidateById, getCandidates } from '@/actions/candidates';
 import type { getInterviewById, getInterviews } from '@/actions/interviews';
 import type { getJobs } from '@/actions/jobs';
 import type { users } from './auth';
-import type { organisations, skills } from './data';
+import type {
+  interviewRecommendationEnum,
+  organisations,
+  skills,
+} from './data';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -33,3 +37,6 @@ export type TInterviewInfo = NonNullable<
 
 export type TSkill = InferSelectModel<typeof skills>;
 export type TNewSkill = InferInsertModel<typeof skills>;
+
+export type TInterviewRecommendation =
+  (typeof interviewRecommendationEnum)['enumValues'][number];

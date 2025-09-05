@@ -1,10 +1,25 @@
-import { IconBriefcaseFilled, IconUserFilled } from "@tabler/icons-react"
-import { Badge } from "@/components/ui/badge"
+"use client"
+import {
+    IconAi,
+    IconBriefcaseFilled,
+    IconUserFilled,
+} from "@tabler/icons-react"
+import type { VariantProps } from "class-variance-authority"
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
+import { Message, MessageContent } from "@/components/ai-elements/message"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge, type badgeVariants } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+    type ChartConfig,
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+} from "@/components/ui/chart"
 import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { TInterviewInfo } from "@/db/types"
+import type { TInterviewInfo, TInterviewRecommendation } from "@/db/types"
 
 const getSkillVariant = (skillValue: number) => {
     if (skillValue > 70) {
@@ -32,10 +47,53 @@ const getDuration = (startTime?: Date | null, endTime?: Date | null) => {
     return `${hours} ч ${minutes} мин`
 }
 
+const getRecommendation = (recommendation: TInterviewRecommendation) => {
+    switch (recommendation) {
+        case "next_stage":
+            return "Следующий этап"
+        case "rejection":
+            return "Отказ"
+        case "needs_clarification":
+            return "Четкого решения нет, нужно уточнить"
+        default:
+            return "Нужно уточнить"
+    }
+}
+
+const RecommendationBadge = ({
+    recommendation,
+}: {
+    recommendation: TInterviewRecommendation
+}) => {
+    let variant: VariantProps<typeof badgeVariants>["variant"] = "outline"
+    switch (recommendation) {
+        case "next_stage":
+            variant = "success"
+            break
+        case "rejection":
+            variant = "destructive"
+            break
+        case "needs_clarification":
+            variant = "secondary"
+            break
+        default:
+            variant = "outline"
+    }
+
+    return <Badge variant={variant}>{getRecommendation(recommendation)}</Badge>
+}
+
+const chartConfig = {
+    value: {
+        label: "Уровень",
+        color: "var(--chart-1)",
+    },
+} satisfies ChartConfig
+
 export const PreviewForm = ({ interview }: { interview: TInterviewInfo }) => {
     return (
         <div className="flex max-w-7xl gap-10">
-            <div className="flex max-w-md flex-4/12 flex-col gap-5 rounded-xl border border-border bg-sidebar p-6">
+            <div className="flex max-w-md flex-4/12 flex-col gap-5 self-start rounded-xl border border-border bg-sidebar p-6">
                 <div className="flex items-center gap-4">
                     <div className="flex aspect-square w-12 items-center justify-center rounded-xl bg-gradient-to-br from-foreground via-foreground/80 to-foreground/60 text-background transition-colors hover:via-foreground/60">
                         <IconUserFilled className="size-6" />
@@ -50,6 +108,33 @@ export const PreviewForm = ({ interview }: { interview: TInterviewInfo }) => {
                         </p>
                     </div>
                 </div>
+
+                <ChartContainer
+                    className="mx-auto aspect-square max-h-[600px] min-h-[300px]"
+                    config={chartConfig}
+                >
+                    <RadarChart
+                        className="overflow-visible"
+                        data={interview.candidate?.skills}
+                    >
+                        <ChartTooltip
+                            content={<ChartTooltipContent />}
+                            cursor={false}
+                        />
+                        <PolarAngleAxis
+                            className="text-xs"
+                            dataKey="name"
+                            overflow="visible"
+                        />
+                        <PolarGrid />
+                        <Radar
+                            dataKey="value"
+                            fill="var(--color-primary)"
+                            fillOpacity={0.6}
+                            overflow="visible"
+                        />
+                    </RadarChart>
+                </ChartContainer>
 
                 <div className="mt-4 flex flex-col gap-2">
                     {interview.candidate?.skills.map((skill) => (
@@ -89,6 +174,11 @@ export const PreviewForm = ({ interview }: { interview: TInterviewInfo }) => {
                                 {interview.job?.name}
                             </h3>
                             <p className="flex gap-2 text-sm">
+                                <RecommendationBadge
+                                    recommendation={
+                                        interview.recommendation as TInterviewRecommendation
+                                    }
+                                />
                                 <Badge variant="outline">
                                     {interview.startTime?.toLocaleDateString(
                                         "ru-RU"
@@ -117,29 +207,34 @@ export const PreviewForm = ({ interview }: { interview: TInterviewInfo }) => {
                         <TabsTrigger value="chat">Диалог</TabsTrigger>
                     </TabsList>
                     <TabsContent value="recommendation">
-                        {interview.recommendation && (
-                            <div className="mt-4">
-                                <p className="font-medium text-sm">
-                                    Резюме: {interview.recommendation}
-                                </p>
-                            </div>
-                        )}
                         {interview.summary && (
                             <div className="mt-4">
                                 <p className="font-medium text-sm">
-                                    Резюме: {interview.summary}
+                                    {interview.summary}
                                 </p>
                             </div>
                         )}
                     </TabsContent>
                     <TabsContent value="chat">
-                        {interview.messages?.map((message, index) => (
-                            <div key={index}>
-                                <p>{message.role}</p>
-                                <p>{message.content}</p>
-                                <Separator className="my-6 bg-border/40" />
-                            </div>
-                        ))}
+                        <ScrollArea className="h-[calc(100vh-250px)] w-full pr-4">
+                            {interview.messages?.map((message, index) => (
+                                // biome-ignore lint/suspicious/noArrayIndexKey: we need to use the index as the key
+                                <Message from={message.role} key={index}>
+                                    <MessageContent>
+                                        {message.content}
+                                    </MessageContent>
+                                    <Avatar>
+                                        <AvatarFallback>
+                                            {message.role === "user" ? (
+                                                <IconUserFilled className="size-4" />
+                                            ) : (
+                                                <IconAi />
+                                            )}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </Message>
+                            ))}
+                        </ScrollArea>
                     </TabsContent>
                 </Tabs>
             </div>

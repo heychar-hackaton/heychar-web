@@ -1,9 +1,13 @@
 'use server';
 
 import { and, eq } from 'drizzle-orm';
+import { redirect } from 'next/navigation';
+import { z } from 'zod';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { candidates, interviews, jobs, organisations, skills } from '@/db/data';
+import type { FormResult } from '@/lib/types';
+import { formError } from '@/lib/utils';
 
 export const getInterviews = async () => {
   const session = await auth();
@@ -121,4 +125,77 @@ export const getInterviewById = async (interviewId: string) => {
         }
       : null,
   };
+};
+
+export const createInterviews = async (
+  _: FormResult,
+  formData: FormData
+): Promise<FormResult> => {
+  const jobId = (formData.get('jobId') as string) ?? '';
+  const candidateIds = formData.getAll('candidateIds') as string[];
+
+  const interviewSchema = z.object({
+    jobId: z.string().min(1, 'Вакансия обязательна'),
+    candidateIds: z
+      .array(z.string())
+      .min(1, 'Выберите хотя бы одного кандидата'),
+  });
+
+  const parsed = interviewSchema.safeParse({ jobId, candidateIds });
+  if (!parsed.success) {
+    return formError(parsed.error.issues);
+  }
+
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  // Проверяем, что вакансия принадлежит пользователю
+  const job = await db.query.jobs.findFirst({
+    where: eq(jobs.id, jobId),
+    with: {
+      organisation: true,
+    },
+  });
+
+  if (
+    !job?.organisation ||
+    job.organisation.userId !== (session.user.id as string)
+  ) {
+    throw new Error('Forbidden');
+  }
+
+  // Проверяем, что все кандидаты принадлежат этой вакансии
+  const candidatesList = await db
+    .select({
+      id: candidates.id,
+      jobId: candidates.jobId,
+    })
+    .from(candidates)
+    .where(
+      and(
+        eq(candidates.jobId, jobId),
+        // Проверяем, что все выбранные кандидаты существуют и принадлежат этой вакансии
+        ...candidateIds.map((id) => eq(candidates.id, id))
+      )
+    );
+
+  if (candidatesList.length !== candidateIds.length) {
+    throw new Error(
+      'Некоторые кандидаты не найдены или не принадлежат выбранной вакансии'
+    );
+  }
+
+  // Создаем интервью для каждого кандидата
+  const interviewsToCreate = candidateIds.map((candidateId) => ({
+    organisationId: job.organisationId,
+    jobId,
+    candidateId,
+    completed: false,
+  }));
+
+  await db.insert(interviews).values(interviewsToCreate);
+
+  redirect('/interviews');
 };

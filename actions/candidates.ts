@@ -44,6 +44,38 @@ export const getCandidates = async () => {
   return candidatesList;
 };
 
+export const getCandidatesByJobId = async (jobId: string) => {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized');
+  }
+
+  const candidatesList = await db
+    .select({
+      id: candidates.id,
+      name: candidates.name,
+      email: candidates.email,
+      phone: candidates.phone,
+      description: candidates.description,
+      createdAt: candidates.createdAt,
+      archived: candidates.archived,
+    })
+    .from(candidates)
+    .leftJoin(jobs, eq(candidates.jobId, jobs.id))
+    .leftJoin(organisations, eq(jobs.organisationId, organisations.id))
+    .where(
+      and(
+        eq(candidates.jobId, jobId),
+        eq(candidates.archived, false),
+        isNotNull(jobs.organisationId),
+        isNotNull(organisations.userId),
+        eq(organisations.userId, session.user.id)
+      )
+    );
+
+  return candidatesList;
+};
+
 export const getCandidateById = async (id: string) => {
   const session = await auth();
   if (!session?.user?.id) {
