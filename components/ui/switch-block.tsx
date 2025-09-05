@@ -2,6 +2,7 @@ import { useId } from "react"
 
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
+import { cn } from "@/lib/utils"
 
 export default function SwitchBlock({
     label,
@@ -18,7 +19,12 @@ export default function SwitchBlock({
 }) {
     const id = useId()
     return (
-        <div className="relative flex w-full items-start gap-2 rounded-md border border-input bg-card p-4 shadow-xs outline-none has-data-[state=checked]:border-primary/50">
+        <div
+            className={cn(
+                "relative flex w-full items-start gap-2 rounded-md border border-input bg-card p-4 shadow-xs outline-none transition-all duration-700",
+                checked && "bg-gradient-to-tr from-card via-card to-primary/10"
+            )}
+        >
             <Switch
                 aria-describedby={`${id}-description`}
                 checked={checked}
