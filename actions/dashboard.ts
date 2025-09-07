@@ -44,7 +44,7 @@ export async function getDashboardData() {
     .where(
       and(
         eq(organisations.userId, session.user.id),
-        eq(interviews.completed, false),
+        eq(interviews.status, 'scheduled'),
         isNotNull(interviews.startTime),
         gt(interviews.startTime, new Date())
       )
