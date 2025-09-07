@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack && pnpm dev:email",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint .",
@@ -13,7 +13,8 @@
     "drop": "drizzle-kit drop",
     "studio": "drizzle-kit studio",
     "update-db": "pnpm migrate && pnpm push",
-    "generate": "drizzle-kit generate"
+    "generate": "drizzle-kit generate",
+    "dev:email": "email dev"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.23",
@@ -36,6 +37,7 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@react-email/components": "^0.5.2",
     "@tabler/icons-react": "^3.34.1",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-table": "^8.21.3",
@@ -76,6 +78,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.2.2",
     "@eslint/eslintrc": "^3",
+    "@react-email/preview-server": "4.2.8",
     "@tailwindcss/postcss": "^4",
     "@types/lodash": "^4.17.20",
     "@types/node": "^20",
@@ -87,6 +90,7 @@
     "@types/word-extractor": "^1.0.6",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9",
+    "react-email": "4.2.8",
     "tailwindcss": "^4",
     "tsx": "^4.20.5",
     "tw-animate-css": "^1.3.7",
