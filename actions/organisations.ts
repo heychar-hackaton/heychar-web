@@ -155,8 +155,12 @@ export const updateOrganisation = async (
     yandexApiKey?: string;
     yandexFolderId?: string;
   } = { organisationId: id };
-  if (yandexApiKey) secretsInput.yandexApiKey = yandexApiKey;
-  if (yandexFolderId) secretsInput.yandexFolderId = yandexFolderId;
+  if (yandexApiKey) {
+    secretsInput.yandexApiKey = yandexApiKey;
+  }
+  if (yandexFolderId) {
+    secretsInput.yandexFolderId = yandexFolderId;
+  }
   if (secretsInput.yandexApiKey || secretsInput.yandexFolderId) {
     await setOrganisationSecrets(secretsInput);
   }
@@ -226,17 +230,12 @@ export async function getOrganisationSecrets(organisationId: string): Promise<{
   yandexApiKey?: string;
   yandexFolderId?: string;
 } | null> {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error('Unauthorized');
-  }
-
   const org = await db.query.organisations.findFirst({
     where: eq(organisations.id, organisationId),
     with: { secrets: true },
   });
-  if (!org || org.userId !== (session.user.id as string)) {
-    throw new Error('Forbidden');
+  if (!org) {
+    throw new Error(`Organisation ${organisationId} not found`);
   }
   if (!org.secrets) {
     return null;

@@ -5,6 +5,7 @@ import {
 } from "@tabler/icons-react"
 import { ChevronLeftIcon } from "lucide-react"
 import type { Metadata } from "next"
+import Link from "next/link"
 import { notFound } from "next/navigation"
 import { getInterviewForApply } from "@/actions/interviews"
 import EmptyDatabase from "@/components/illustrations/empty-database"
@@ -77,22 +78,24 @@ export default async function Page(props: PageProps<"/apply/[id]">) {
                 </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-                <Button
-                    className="group h-auto gap-4 py-2 text-right"
-                    variant="outline"
-                >
-                    <ChevronLeftIcon
-                        aria-hidden="true"
-                        className="group-hover:-translate-x-0.5 opacity-60 transition-transform"
-                        size={16}
-                    />
-                    <div className="space-y-1">
-                        <h3 className="font-bold">Продолжить онлайн</h3>
-                        <p className="whitespace-break-spaces font-normal text-muted-foreground">
-                            Вы перейдете на страницу собеседования
-                        </p>
-                    </div>
-                </Button>
+                <Link href={`/apply/${interview.id}/room`}>
+                    <Button
+                        className="group h-auto gap-4 py-2 text-right"
+                        variant="outline"
+                    >
+                        <ChevronLeftIcon
+                            aria-hidden="true"
+                            className="group-hover:-translate-x-0.5 opacity-60 transition-transform"
+                            size={16}
+                        />
+                        <div className="space-y-1">
+                            <h3 className="font-bold">Продолжить онлайн</h3>
+                            <p className="whitespace-break-spaces font-normal text-muted-foreground">
+                                Вы перейдете на страницу собеседования
+                            </p>
+                        </div>
+                    </Button>
+                </Link>
                 <CallButton
                     interviewId={interview.id}
                     phone={interview.candidate?.phone ?? ""}

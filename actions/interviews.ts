@@ -4,11 +4,11 @@ import { and, eq, inArray } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { dispatchAgent } from '@/actions/livekit';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { candidates, interviews, jobs, organisations, skills } from '@/db/data';
 import type { TInterviewStatus } from '@/db/types';
-import { createCallRoom } from '@/lib/livekit';
 import { sendInterviewEmail } from '@/lib/mail';
 import type { FormResult } from '@/lib/types';
 import { formError, formErrorFromString, okResult } from '@/lib/utils';
@@ -342,7 +342,7 @@ export const callInterview = async (
     })
     .where(eq(interviews.id, interviewId));
 
-  createCallRoom(interviewId, phone);
+  dispatchAgent(interviewId, phone);
 
   return okResult({ interviewId, phone });
 };
