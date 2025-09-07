@@ -27,22 +27,37 @@ export const InterviewList = ({ interviews }: { interviews: TInterview[] }) => {
                     header: "Организация",
                 },
                 {
-                    accessorKey: "completed",
+                    accessorKey: "status",
                     header: "Статус",
                     cell: ({ row }) => {
-                        if (!row.original.startTime) {
-                            return (
-                                <Badge variant="secondary">
-                                    Еще не началось
-                                </Badge>
-                            )
+                        switch (row.original.status) {
+                            case "scheduled":
+                                return (
+                                    <Badge variant="secondary">
+                                        Запланировано
+                                    </Badge>
+                                )
+                            case "in_progress":
+                                return (
+                                    <Badge variant="default">В процессе</Badge>
+                                )
+                            case "completed":
+                                return (
+                                    <Badge variant="success">Завершено</Badge>
+                                )
+                            case "cancelled":
+                                return (
+                                    <Badge variant="destructive">
+                                        Отменено
+                                    </Badge>
+                                )
+                            default:
+                                return (
+                                    <Badge variant="secondary">
+                                        Неизвестно
+                                    </Badge>
+                                )
                         }
-
-                        return row.original.endTime ? (
-                            <Badge variant="default">Завершено</Badge>
-                        ) : (
-                            <Badge variant="secondary">В процессе</Badge>
-                        )
                     },
                 },
                 {
