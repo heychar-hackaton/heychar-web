@@ -12,7 +12,8 @@
       },
       "suspicious": {
         "noDocumentCookie": "off",
-        "useAwait": "off"
+        "useAwait": "off",
+        "noConsole": "off"
       },
       "performance": {
         "noNamespaceImport": "off"

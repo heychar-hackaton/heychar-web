@@ -30,7 +30,9 @@ const InterviewEmail = ({
     <Html>
         <Head />
         <Body style={main}>
-            <Preview>Your login code for Linear</Preview>
+            <Preview>
+                {organisation} приглашает вас пройти собеседование
+            </Preview>
             <Container style={container}>
                 <Container>
                     <Section>

@@ -253,7 +253,8 @@ export const createInterviews = async (
       )
     );
 
-  await Promise.all(
+  // Отправляем email для каждого интервью и собираем результаты
+  const emailResults = await Promise.allSettled(
     interviewsWithDetails.map((interview) =>
       sendInterviewEmail({
         interviewUrl: `${origin}/apply/${interview.id}`,
@@ -264,6 +265,24 @@ export const createInterviews = async (
       })
     )
   );
+
+  // Подсчитываем неудачные отправки
+  let failureCount = 0;
+
+  for (const result of emailResults) {
+    if (
+      result.status === 'rejected' ||
+      (result.status === 'fulfilled' && !result.value.success)
+    ) {
+      failureCount++;
+    }
+  }
+
+  // Если есть неудачные отправки, можно добавить дополнительную обработку
+  if (failureCount > 0) {
+    // Здесь можно добавить уведомление администратора или другую логику
+    console.error(emailResults);
+  }
 
   redirect('/interviews');
 };
