@@ -18,6 +18,7 @@ interface InterviewEmailProps {
     job: string
     organisation: string
     interviewUrl: string
+    cancelUrl: string
     candidateName?: string
 }
 
@@ -26,6 +27,7 @@ const InterviewEmail = ({
     job,
     organisation,
     interviewUrl,
+    cancelUrl,
 }: InterviewEmailProps) => (
     <Html>
         <Head />
@@ -79,7 +81,7 @@ const InterviewEmail = ({
 
                 <Text style={paragraph}>
                     Если это предложение вам не подходит, пожалуйста,{" "}
-                    <Link href="https://heychar.ru" style={link}>
+                    <Link href={cancelUrl} style={link}>
                         отклоните
                     </Link>{" "}
                     его.
@@ -103,6 +105,7 @@ InterviewEmail.PreviewProps = {
     job: "Разработчик Next.js",
     organisation: "ГК КАМИН",
     interviewUrl: "https://heychar.ru/interview",
+    cancelUrl: "https://heychar.ru/cancel",
 } as InterviewEmailProps
 
 export default InterviewEmail

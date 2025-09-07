@@ -1,6 +1,7 @@
 "use client"
 
 import { ChevronRightIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useActionState, useEffect, useState } from "react"
 import { toast } from "sonner"
 import { callInterview } from "@/actions/interviews"
@@ -28,7 +29,7 @@ export const CallButton = ({
 }) => {
     const [data, dispatch] = useActionState(callInterview, {})
     const [isOpen, setIsOpen] = useState(false)
-
+    const router = useRouter()
     useEffect(() => {
         console.log(data)
         if (data.success === false) {
@@ -41,8 +42,9 @@ export const CallButton = ({
                 description: "Через несколько минут Вам поступит звонок",
             })
             setIsOpen(false)
+            router.refresh()
         }
-    }, [data])
+    }, [data, router])
 
     return (
         <Dialog onOpenChange={setIsOpen} open={isOpen}>

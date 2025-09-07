@@ -154,6 +154,17 @@ export const getInterviewForApply = async (interviewId: string) => {
   return interview;
 };
 
+export const cancelInterview = async (formData: FormData) => {
+  const interviewId = (formData.get('interviewId') as string) ?? '';
+
+  await db
+    .update(interviews)
+    .set({ status: 'cancelled' })
+    .where(eq(interviews.id, interviewId));
+
+  redirect(`/cancel/${interviewId}`);
+};
+
 export const createInterviews = async (
   _: FormResult,
   formData: FormData
@@ -262,6 +273,7 @@ export const createInterviews = async (
     interviewsWithDetails.map((interview) =>
       sendInterviewEmail({
         interviewUrl: `${origin}/apply/${interview.id}`,
+        cancelUrl: `${origin}/cancel/${interview.id}`,
         candidateName: interview.candidate?.name || '',
         job: interview.job?.name || '',
         organisation: interview.organisation?.name || '',

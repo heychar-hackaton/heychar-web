@@ -23,8 +23,9 @@ export const authConfig: NextAuthConfig = {
       const isLoggedIn = !!auth?.user;
       const isOnAuth = nextUrl.pathname.startsWith('/auth');
       const isOnApply = nextUrl.pathname.startsWith('/apply');
+      const isOnCancel = nextUrl.pathname.startsWith('/cancel');
 
-      if (isOnApply) {
+      if (isOnApply || isOnCancel) {
         return true;
       }
 

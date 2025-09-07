@@ -15,6 +15,7 @@ const transporter = createTransport({
 export const sendInterviewEmail = async (interview: {
     candidateName: string
     interviewUrl: string
+    cancelUrl: string
     job: string
     organisation: string
     candidateEmail: string
