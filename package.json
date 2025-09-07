@@ -50,6 +50,7 @@
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.5",
     "iconv-lite": "^0.7.0",
+    "livekit-server-sdk": "^2.13.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.542.0",
     "mammoth": "^1.10.0",

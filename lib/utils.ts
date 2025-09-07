@@ -14,6 +14,13 @@ export const formError = (issues: z.core.$ZodIssue[]): FormResult => {
   };
 };
 
+export const formErrorFromString = (issue: string): FormResult => {
+  return {
+    errors: [issue],
+    success: false,
+  };
+};
+
 export const okResult = <T = object>(data?: T): FormResult<T> => {
   return {
     data,

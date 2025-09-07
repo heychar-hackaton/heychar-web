@@ -5,6 +5,7 @@ import type { getJobs } from '@/actions/jobs';
 import type { users } from './auth';
 import type {
   interviewRecommendationEnum,
+  interviewStatusEnum,
   organisations,
   skills,
 } from './data';
@@ -40,3 +41,6 @@ export type TNewSkill = InferInsertModel<typeof skills>;
 
 export type TInterviewRecommendation =
   (typeof interviewRecommendationEnum)['enumValues'][number];
+
+export type TInterviewStatus =
+  (typeof interviewStatusEnum)['enumValues'][number];

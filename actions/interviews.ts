@@ -7,9 +7,13 @@ import { z } from 'zod';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { candidates, interviews, jobs, organisations, skills } from '@/db/data';
+import type { TInterviewStatus } from '@/db/types';
+import { createCallRoom } from '@/lib/livekit';
 import { sendInterviewEmail } from '@/lib/mail';
 import type { FormResult } from '@/lib/types';
-import { formError } from '@/lib/utils';
+import { formError, formErrorFromString, okResult } from '@/lib/utils';
+
+const phoneRegex = /^\+?[1-9]\d{1,14}$/;
 
 export const getInterviews = async (interviewIds?: string[]) => {
   const session = await auth();
@@ -28,7 +32,7 @@ export const getInterviews = async (interviewIds?: string[]) => {
   const interviewsList = await db
     .select({
       id: interviews.id,
-      completed: interviews.completed,
+      status: interviews.status,
       summary: interviews.summary,
       recordingUrl: interviews.recordingUrl,
       matchPercentage: interviews.matchPercentage,
@@ -68,7 +72,7 @@ export const getInterviewById = async (interviewId: string) => {
   const interviewData = await db
     .select({
       id: interviews.id,
-      completed: interviews.completed,
+      status: interviews.status,
       summary: interviews.summary,
       recordingUrl: interviews.recordingUrl,
       matchPercentage: interviews.matchPercentage,
@@ -215,7 +219,7 @@ export const createInterviews = async (
     organisationId: job.organisationId,
     jobId,
     candidateId,
-    completed: false,
+    status: 'scheduled' as TInterviewStatus,
   }));
 
   const origin = (await headers()).get('origin');
@@ -285,4 +289,48 @@ export const createInterviews = async (
   }
 
   redirect('/interviews');
+};
+
+export const callInterview = async (
+  _: FormResult,
+  formData: FormData
+): Promise<FormResult> => {
+  console.log(formData);
+  const interviewId = (formData.get('interviewId') as string) ?? '';
+  const phone = (formData.get('phone') as string) ?? '';
+
+  const interviewSchema = z.object({
+    phone: z
+      .string()
+      .min(1, 'Телефон обязателен')
+      .regex(phoneRegex, 'Укажите корректный телефон'),
+  });
+
+  const parsed = interviewSchema.safeParse({ phone });
+  if (!parsed.success) {
+    return formError(parsed.error.issues);
+  }
+
+  const interview = await db.query.interviews.findFirst({
+    where: eq(interviews.id, interviewId),
+  });
+
+  if (!interview) {
+    return formErrorFromString('Интервью не найдено');
+  }
+
+  if (interview.status === 'in_progress') {
+    return formErrorFromString('Интервью уже началось');
+  }
+
+  await db
+    .update(interviews)
+    .set({
+      status: 'in_progress',
+    })
+    .where(eq(interviews.id, interviewId));
+
+  createCallRoom(interviewId, phone);
+
+  return okResult({ interviewId, phone });
 };

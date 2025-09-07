@@ -16,6 +16,13 @@ export const interviewRecommendationEnum = pgEnum(
   'interview_recommendation_enum',
   ['next_stage', 'rejection', 'needs_clarification']
 );
+export const interviewStatusEnum = pgEnum('interview_status_enum', [
+  'scheduled',
+  'in_progress',
+  'paused',
+  'completed',
+  'cancelled',
+]);
 
 // -------------------- Domain tables --------------------
 export const organisations = pgTable('organisations', {
@@ -80,7 +87,7 @@ export const interviews = pgTable('interviews', {
   candidateId: text('candidate_id').references(() => candidates.id, {
     onDelete: 'cascade',
   }),
-  completed: boolean('completed').default(false).notNull(),
+  status: interviewStatusEnum('status').default('scheduled').notNull(),
   messages:
     jsonb('messages').$type<
       {
