@@ -22,6 +22,11 @@ export const authConfig: NextAuthConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnAuth = nextUrl.pathname.startsWith('/auth');
+      const isOnApply = nextUrl.pathname.startsWith('/apply');
+
+      if (isOnApply) {
+        return true;
+      }
 
       if (isLoggedIn && isOnAuth) {
         return Response.redirect(new URL('/', nextUrl));

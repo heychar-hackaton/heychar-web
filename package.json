@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack && pnpm dev:email",
+    "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint .",
@@ -63,6 +63,7 @@
     "pdf-parse": "^1.1.1",
     "pdf-text-reader": "^5.1.0",
     "pg": "^8.16.3",
+    "prettier": "^3.6.2",
     "react": "19.1.0",
     "react-day-picker": "^9.9.0",
     "react-dom": "19.1.0",

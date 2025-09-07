@@ -18,11 +18,11 @@ interface InterviewEmailProps {
     job: string
     organisation: string
     interviewUrl: string
-    name?: string
+    candidateName?: string
 }
 
-export const InterviewEmail = ({
-    name,
+const InterviewEmail = ({
+    candidateName,
     job,
     organisation,
     interviewUrl,
@@ -54,7 +54,9 @@ export const InterviewEmail = ({
                 </Container>
 
                 <Heading style={heading}>
-                    {name ? `Здравствуйте, ${name}!` : "Здравствуйте!"}
+                    {candidateName
+                        ? `Здравствуйте, ${candidateName}!`
+                        : "Здравствуйте!"}
                 </Heading>
                 <Text style={paragraph}>
                     Вы были приглашены на собеседование в{" "}
@@ -95,7 +97,7 @@ export const InterviewEmail = ({
 )
 
 InterviewEmail.PreviewProps = {
-    name: "Иван",
+    candidateName: "Иван",
     job: "Разработчик Next.js",
     organisation: "ГК КАМИН",
     interviewUrl: "https://heychar.ru/interview",

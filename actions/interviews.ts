@@ -1,18 +1,28 @@
 'use server';
 
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { candidates, interviews, jobs, organisations, skills } from '@/db/data';
+import { sendInterviewEmail } from '@/lib/mail';
 import type { FormResult } from '@/lib/types';
 import { formError } from '@/lib/utils';
 
-export const getInterviews = async () => {
+export const getInterviews = async (interviewIds?: string[]) => {
   const session = await auth();
   if (!session?.user) {
     throw new Error('Unauthorized');
+  }
+
+  // Строим условия фильтрации
+  const whereConditions = [eq(organisations.userId, session.user.id as string)];
+
+  // Если передан массив interviewIds, добавляем фильтрацию по ним
+  if (interviewIds?.length) {
+    whereConditions.push(inArray(interviews.id, interviewIds));
   }
 
   const interviewsList = await db
@@ -43,7 +53,7 @@ export const getInterviews = async () => {
     .leftJoin(organisations, eq(interviews.organisationId, organisations.id))
     .leftJoin(jobs, eq(interviews.jobId, jobs.id))
     .leftJoin(candidates, eq(interviews.candidateId, candidates.id))
-    .where(eq(organisations.userId, session.user.id as string));
+    .where(and(...whereConditions));
 
   return interviewsList;
 };
@@ -127,6 +137,19 @@ export const getInterviewById = async (interviewId: string) => {
   };
 };
 
+export const getInterviewForApply = async (interviewId: string) => {
+  const interview = await db.query.interviews.findFirst({
+    where: eq(interviews.id, interviewId),
+    with: {
+      organisation: true,
+      job: true,
+      candidate: true,
+    },
+  });
+
+  return interview;
+};
+
 export const createInterviews = async (
   _: FormResult,
   formData: FormData
@@ -195,7 +218,52 @@ export const createInterviews = async (
     completed: false,
   }));
 
-  await db.insert(interviews).values(interviewsToCreate);
+  const origin = (await headers()).get('origin');
+
+  const createdInterviews = await db
+    .insert(interviews)
+    .values(interviewsToCreate)
+    .returning({
+      id: interviews.id,
+    });
+
+  // Получаем полную информацию о созданных интервью для отправки email
+  const interviewsWithDetails = await db
+    .select({
+      id: interviews.id,
+      organisation: {
+        name: organisations.name,
+      },
+      job: {
+        name: jobs.name,
+      },
+      candidate: {
+        name: candidates.name,
+        email: candidates.email,
+      },
+    })
+    .from(interviews)
+    .leftJoin(organisations, eq(interviews.organisationId, organisations.id))
+    .leftJoin(jobs, eq(interviews.jobId, jobs.id))
+    .leftJoin(candidates, eq(interviews.candidateId, candidates.id))
+    .where(
+      inArray(
+        interviews.id,
+        createdInterviews.map((i) => i.id)
+      )
+    );
+
+  await Promise.all(
+    interviewsWithDetails.map((interview) =>
+      sendInterviewEmail({
+        interviewUrl: `${origin}/apply/${interview.id}`,
+        candidateName: interview.candidate?.name || '',
+        job: interview.job?.name || '',
+        organisation: interview.organisation?.name || '',
+        candidateEmail: interview.candidate?.email || '',
+      })
+    )
+  );
 
   redirect('/interviews');
 };
