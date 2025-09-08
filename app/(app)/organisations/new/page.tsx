@@ -53,7 +53,7 @@ export default function NewOrganisation() {
                         Описание
                     </Label>
                     <Textarea
-                        className="max-h-[328px] min-h-[228px] resize-none"
+                        className="wrap-anywhere h-[228px] max-h-[328px] resize-none"
                         name="description"
                         placeholder="Напишите описание организации, чтобы агент имел представление о ней во время разговора"
                         required
