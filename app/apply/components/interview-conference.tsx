@@ -1,19 +1,8 @@
-import type {
-    MessageDecoder,
-    MessageEncoder,
-    TrackReferenceOrPlaceholder,
-    WidgetState,
-} from "@livekit/components-core"
-import {
-    isEqualTrackRef,
-    isTrackReference,
-    isWeb,
-    log,
-} from "@livekit/components-core"
+import type { MessageDecoder, MessageEncoder } from "@livekit/components-core"
+import { isEqualTrackRef, isWeb } from "@livekit/components-core"
 import type { MessageFormatter } from "@livekit/components-react"
 import {
     CarouselLayout,
-    ConnectionStateToast,
     ControlBar,
     FocusLayout,
     FocusLayoutContainer,
