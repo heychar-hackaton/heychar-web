@@ -133,20 +133,12 @@ export const getCandidateById = async (id: string) => {
 
 const candidateFieldsSchema = z.object({
   name: z.string().optional().default(''),
-  email: z.email('Неверный email').or(z.literal('')),
+  email: z.email('Неверный email').min(1, 'Email обязателен'),
   phone: z.string().or(z.literal('')),
   jobId: z.string().min(1, 'Вакансия обязательна'),
   description: z.string().min(1, 'Описание обязательно'),
-  archived: z.boolean(),
+  archived: z.boolean().optional().default(false),
 });
-
-const candidateBaseSchema = candidateFieldsSchema.refine(
-  (val) => val.email !== '' || val.phone !== '',
-  {
-    message: 'Укажите email или телефон',
-    path: ['email'],
-  }
-);
 
 export const createCandidate = async (
   _: FormResult,
@@ -158,7 +150,7 @@ export const createCandidate = async (
   const jobId = (formData.get('jobId') as string) ?? '';
   const description = (formData.get('description') as string) ?? '';
 
-  const parsed = candidateBaseSchema.safeParse({
+  const parsed = candidateFieldsSchema.safeParse({
     name,
     email,
     phone,
@@ -180,17 +172,14 @@ export const createCandidate = async (
     phone: parsed.data.phone || null,
     jobId: parsed.data.jobId || null,
     description: parsed.data.description || null,
+    archived: false
   });
 
   redirect('/candidates');
 };
 
 const updateCandidateSchema = candidateFieldsSchema
-  .extend({ id: z.string().min(1), archived: z.boolean() })
-  .refine((val) => val.email !== '' || val.phone !== '', {
-    message: 'Укажите email или телефон',
-    path: ['email'],
-  });
+  .extend({ id: z.string().min(1), archived: z.boolean() });
 
 export const updateCandidate = async (
   _: FormResult,

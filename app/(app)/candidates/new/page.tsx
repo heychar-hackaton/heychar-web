@@ -117,7 +117,7 @@ export default function NewCandidatePage() {
           />
         </FormField>
         <FormField>
-          <Label className="shrink-0 basis-3/12" htmlFor="email">
+          <Label className="shrink-0 basis-3/12" htmlFor="email" required>
             Email
           </Label>
           <Input
@@ -126,6 +126,7 @@ export default function NewCandidatePage() {
             onChange={(e) => setEmail(e.target.value)}
             type="email"
             value={email}
+            required
           />
         </FormField>
         <FormField>
