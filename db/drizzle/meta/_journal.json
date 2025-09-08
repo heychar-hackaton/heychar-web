@@ -71,6 +71,27 @@
       "when": 1757271955118,
       "tag": "0009_open_agent_zero",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1757310382764,
+      "tag": "0010_complete_amphibian",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1757310714428,
+      "tag": "0011_parallel_winter_soldier",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1757333912735,
+      "tag": "0012_wise_kulan_gath",
+      "breakpoints": true
     }
   ]
 }

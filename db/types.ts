@@ -6,7 +6,9 @@ import type { users } from './auth';
 import type {
   interviewRecommendationEnum,
   interviewStatusEnum,
+  organisationSecrets,
   organisations,
+  providerEnum,
   skills,
 } from './data';
 
@@ -44,3 +46,10 @@ export type TInterviewRecommendation =
 
 export type TInterviewStatus =
   (typeof interviewStatusEnum)['enumValues'][number];
+
+export type TOrganisationSecret = InferSelectModel<typeof organisationSecrets>;
+export type TNewOrganisationSecret = InferInsertModel<
+  typeof organisationSecrets
+>;
+
+export type TProvider = (typeof providerEnum)['enumValues'][number];

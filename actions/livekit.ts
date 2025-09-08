@@ -61,26 +61,37 @@ export async function dispatchAgent(
   // Извлекаем ID интервью из имени комнаты
   const interviewId = roomName.replace('interview-', '');
   const interview = await getInterviewForApply(interviewId);
-  const secrets = await getOrganisationSecrets(
-    interview?.organisation?.id || ''
-  );
+
+  if (!interview?.organisation?.id) {
+    throw new Error('Interview or organisation not found');
+  }
+
+  const secrets = await getOrganisationSecrets(interview.organisation.id);
+
+  if (!secrets) {
+    throw new Error('No secrets found for organisation');
+  }
+
+  console.log(`Dispatching agent with provider: ${secrets.provider}`);
 
   const metadata = {
     company: {
-      name: interview?.organisation?.name,
-      description: interview?.organisation?.description,
+      name: interview.organisation.name,
+      description: interview.organisation.description,
     },
     job: {
-      name: interview?.job?.name,
-      description: interview?.job?.description,
+      name: interview.job?.name,
+      description: interview.job?.description,
     },
     candidate: {
-      name: interview?.candidate?.name,
-      description: interview?.candidate?.description,
+      name: interview.candidate?.name,
+      description: interview.candidate?.description,
     },
     phone_number: phoneNumber,
-    yandex_api_key: secrets?.yandexApiKey,
-    yandex_folder_id: secrets?.yandexFolderId,
+    // Provider-specific secrets
+    provider: secrets.provider,
+    api_key: secrets.apiKey,
+    folder_id: secrets.folderId, // Only for Yandex
   };
 
   await agentDispatchClient.createDispatch(

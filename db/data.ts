@@ -23,27 +23,37 @@ export const interviewStatusEnum = pgEnum('interview_status_enum', [
   'completed',
   'cancelled',
 ]);
+export const providerEnum = pgEnum('provider_enum', ['yandex', 'openai']);
 
 // -------------------- Domain tables --------------------
+export const providers = pgTable('providers', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  type: providerEnum('type').notNull(),
+  apiKeyEnc: text('api_key_enc').notNull(),
+  folderIdEnc: text('folder_id_enc'), // Only for Yandex
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
+    .defaultNow()
+    .notNull(),
+});
 export const organisations = pgTable('organisations', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
   description: text('description'),
+  providerId: text('provider_id')
+    .notNull()
+    .references(() => providers.id, {
+      onDelete: 'set null',
+    }),
   userId: text('user_id').references(() => users.id, { onDelete: 'set null' }),
-});
-
-// Stores encrypted per-organisation secrets (AES-256-GCM packed JSON)
-export const organisationSecrets = pgTable('organisation_secrets', {
-  organisationId: text('organisation_id')
-    .primaryKey()
-    .references(() => organisations.id, { onDelete: 'cascade' }),
-  apiKeyEnc: text('api_key_enc'),
-  folderIdEnc: text('folder_id_enc'),
-  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
-    .defaultNow()
-    .notNull(),
 });
 
 export const jobs = pgTable('jobs', {
@@ -117,6 +127,14 @@ export const skills = pgTable('skills', {
 
 // -------------------- Relations --------------------
 
+export const providersRelations = relations(providers, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [providers.userId],
+    references: [users.id],
+  }),
+  organisations: many(organisations),
+}));
+
 export const organisationsRelations = relations(
   organisations,
   ({ one, many }) => ({
@@ -124,12 +142,12 @@ export const organisationsRelations = relations(
       fields: [organisations.userId],
       references: [users.id],
     }),
+    provider: one(providers, {
+      fields: [organisations.providerId],
+      references: [providers.id],
+    }),
     jobs: many(jobs),
     interviews: many(interviews),
-    secrets: one(organisationSecrets, {
-      fields: [organisations.id],
-      references: [organisationSecrets.organisationId],
-    }),
   })
 );
 
