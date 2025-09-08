@@ -1,15 +1,12 @@
 "use client"
 
-import {
-    ConnectionStateToast,
-    LiveKitRoom,
-    RoomAudioRenderer,
-    VideoConference,
-} from "@livekit/components-react"
+import { LiveKitRoom } from "@livekit/components-react"
 import { useEffect, useRef, useState, useTransition } from "react"
 import { dispatchAgent, generateLiveKitToken } from "@/actions/livekit"
 import "@livekit/components-styles"
-import { Button } from "../../../components/ui/button"
+import { IconLoader } from "@tabler/icons-react"
+import { Button } from "@/components/ui/button"
+import { InterviewConference } from "./interview-conference"
 
 interface LiveKitRoomComponentProps {
     roomName: string
@@ -82,7 +79,7 @@ export default function LiveKitRoomComponent({
                     <h2 className="mb-2 font-semibold text-red-800">Error</h2>
                     <p className="text-red-600">{error}</p>
                     <Button onClick={() => window.location.reload()}>
-                        Retry
+                        Попробовать снова
                     </Button>
                 </div>
             </div>
@@ -91,19 +88,18 @@ export default function LiveKitRoomComponent({
 
     if (!(token && wsUrl) || isPending) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-center">
-                    <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-blue-600 border-b-2" />
-                    <p>Connecting to LiveKit...</p>
-                </div>
+            <div className="flex min-h-screen flex-col items-center justify-center gap-2">
+                <IconLoader className="size-8 animate-spin" />
+                <p>Подключение к cобеседованию</p>
             </div>
         )
     }
 
     return (
-        <div style={{ height: "100vh", width: "100vw" }}>
+        <div className="h-screen w-screen">
             <LiveKitRoom
                 audio={true}
+                className="h-screen"
                 data-lk-theme="default"
                 lang="ru"
                 onConnected={() => {
@@ -116,25 +112,10 @@ export default function LiveKitRoomComponent({
                     console.log("Disconnected from room")
                 }}
                 serverUrl={wsUrl}
-                style={{ height: "100vh" }}
                 token={token}
                 video={false}
             >
-                <VideoConference />
-                <RoomAudioRenderer />
-                <ConnectionStateToast />
-
-                {/* Кнопка для ручного диспатча агента */}
-                {!(autoDispatchAgent || agentDispatched) && (
-                    <div className="absolute top-4 right-4 z-10">
-                        <Button
-                            disabled={isPending}
-                            onClick={handleDispatchAgent}
-                        >
-                            {isPending ? "Calling Agent..." : "Call AI Agent"}
-                        </Button>
-                    </div>
-                )}
+                <InterviewConference />
             </LiveKitRoom>
         </div>
     )

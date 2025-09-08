@@ -21,6 +21,7 @@
     "@auth/core": "^0.40.0",
     "@auth/drizzle-adapter": "^1.10.0",
     "@gravity-ui/icons": "^2.16.0",
+    "@livekit/components-core": "^0.12.9",
     "@livekit/components-react": "^2.9.14",
     "@livekit/components-styles": "^1.1.6",
     "@mdxeditor/editor": "^3.42.0",
