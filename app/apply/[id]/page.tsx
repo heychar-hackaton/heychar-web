@@ -29,7 +29,7 @@ export default async function Page(props: PageProps<"/apply/[id]">) {
             <EmptyState
                 description="Собеседование уже проведено"
                 illustration={<EmptyDatabase />}
-                title="В уже всё"
+                title="А уже всё"
             />
         )
     }

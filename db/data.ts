@@ -104,11 +104,14 @@ export const interviews = pgTable('interviews', {
   messages:
     jsonb('messages').$type<
       {
+        id: string;
         role: 'user' | 'assistant';
         content: string;
+        interrupted: boolean;
       }[]
     >(),
   summary: text('summary'),
+  redFlags: text('red_flags'),
   recordingUrl: text('recording_url'),
   matchPercentage: numeric('match_percentage'),
   recommendation: interviewRecommendationEnum('recommendation'),

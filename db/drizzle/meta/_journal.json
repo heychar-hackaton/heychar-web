@@ -99,6 +99,13 @@
       "when": 1757427661465,
       "tag": "0013_glossy_wilson_fisk",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1757436037108,
+      "tag": "0014_first_inertia",
+      "breakpoints": true
     }
   ]
 }

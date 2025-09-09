@@ -83,7 +83,7 @@ export const createProvider = async (
   }
 
   // Encrypt API key and folder ID
-  const aad = session.user.id as string;
+  const aad = process.env.ENCRYPTION_KEY || '';
   const apiKeyEnc = pack(encryptString(apiKey, aad));
   const folderIdEnc = folderId ? pack(encryptString(folderId, aad)) : undefined;
 
@@ -166,13 +166,12 @@ export const updateProvider = async (
   };
 
   // Update API key and folder ID only if provided
+  const aad = process.env.ENCRYPTION_KEY || '';
   if (apiKey) {
-    const aad = session.user.id as string;
     updateData.apiKeyEnc = pack(encryptString(apiKey, aad));
   }
 
   if (folderId) {
-    const aad = session.user.id as string;
     updateData.folderIdEnc = pack(encryptString(folderId, aad));
   }
 

@@ -62,9 +62,12 @@ export const getInterviews = async (interviewIds?: string[]) => {
   return interviewsList;
 };
 
-export const getInterviewById = async (interviewId: string) => {
+export const getInterviewById = async (
+  interviewId: string,
+  fromApi = false
+) => {
   const session = await auth();
-  if (!session?.user) {
+  if (!(session?.user || fromApi)) {
     throw new Error('Unauthorized');
   }
 
@@ -80,6 +83,7 @@ export const getInterviewById = async (interviewId: string) => {
       startTime: interviews.startTime,
       endTime: interviews.endTime,
       messages: interviews.messages,
+      redFlags: interviews.redFlags,
       organisation: {
         id: organisations.id,
         name: organisations.name,
@@ -109,7 +113,9 @@ export const getInterviewById = async (interviewId: string) => {
     .where(
       and(
         eq(interviews.id, interviewId),
-        eq(organisations.userId, session.user.id as string)
+        fromApi
+          ? undefined
+          : eq(organisations.userId, session?.user?.id as string)
       )
     );
 

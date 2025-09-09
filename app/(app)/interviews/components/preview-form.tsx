@@ -1,4 +1,5 @@
 "use client"
+import { Markdown } from "@react-email/components"
 import {
     IconAi,
     IconBriefcaseFilled,
@@ -209,9 +210,7 @@ export const PreviewForm = ({ interview }: { interview: TInterviewInfo }) => {
                     <TabsContent value="recommendation">
                         {interview.summary && (
                             <div className="mt-4">
-                                <p className="font-medium text-sm">
-                                    {interview.summary}
-                                </p>
+                                <Markdown>{interview.summary}</Markdown>
                             </div>
                         )}
                     </TabsContent>

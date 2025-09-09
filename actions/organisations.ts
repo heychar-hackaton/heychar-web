@@ -189,7 +189,7 @@ export async function getOrganisationSecrets(organisationId: string): Promise<{
     throw new Error(`Organisation ${organisationId} not found`);
   }
 
-  const aad = org.userId ?? ''; // bind ciphertexts to user id
+  const aad = process.env.ENCRYPTION_KEY || '';
   const apiKey = decryptString(unpack(org.provider.apiKeyEnc), aad);
 
   if (org.provider.type === 'yandex' && org.provider.folderIdEnc) {

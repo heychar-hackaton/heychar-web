@@ -3,14 +3,13 @@
 import { IconExternalLink } from "@tabler/icons-react"
 import Link from "next/link"
 import { useActionState, useState } from "react"
-import { deleteProvider, updateProvider } from "@/actions/providers"
+import { updateProvider } from "@/actions/providers"
 import { Form } from "@/components/form"
 import FormBody from "@/components/form/form-body"
 import { FormField } from "@/components/form/form-field"
 import FormFooter from "@/components/form/form-footer"
 import FormSegmentHeader from "@/components/form/form-segment-header"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -29,7 +28,6 @@ type Provider = {
 
 export function EditProviderForm({ provider }: { provider: Provider }) {
     const [data, dispatch] = useActionState(updateProvider, {})
-    const [, deleteDispatch] = useActionState(deleteProvider, {})
     const [providerType, setProviderType] = useState<"yandex" | "openai">(
         provider.type
     )
@@ -185,30 +183,7 @@ export function EditProviderForm({ provider }: { provider: Provider }) {
                     </>
                 )}
             </FormBody>
-            <FormFooter
-                additionalActions={
-                    <form action={deleteDispatch}>
-                        <input name="id" type="hidden" value={provider.id} />
-                        <Button
-                            onClick={(e) => {
-                                if (
-                                    !confirm(
-                                        "Вы уверены, что хотите удалить этого провайдера?"
-                                    )
-                                ) {
-                                    e.preventDefault()
-                                }
-                            }}
-                            type="submit"
-                            variant="destructive"
-                        >
-                            Удалить
-                        </Button>
-                    </form>
-                }
-                cancelLabel="Назад"
-                submitLabel="Сохранить"
-            />
+            <FormFooter cancelLabel="Назад" submitLabel="Сохранить" />
         </Form>
     )
 }
