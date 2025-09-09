@@ -77,6 +77,8 @@ export async function dispatchAgent(
     job: {
       name: interview.job?.name,
       description: interview.job?.description,
+      hard_skills_score: interview.job?.hardSkillsScore,
+      soft_skills_score: interview.job?.softSkillsScore,
     },
     candidate: {
       name: interview.candidate?.name,
@@ -87,8 +89,6 @@ export async function dispatchAgent(
     provider: secrets.provider,
     api_key: secrets.apiKey,
     folder_id: secrets.folderId,
-    hard_skills_score: interview.job?.hardSkillsScore,
-    soft_skills_score: interview.job?.softSkillsScore,
   };
 
   const agentDispatchClient = new AgentDispatchClient(
