@@ -5,6 +5,7 @@ import {
   numeric,
   pgEnum,
   pgTable,
+  real,
   text,
   timestamp,
 } from 'drizzle-orm/pg-core';
@@ -65,6 +66,8 @@ export const jobs = pgTable('jobs', {
   organisationId: text('organisation_id').references(() => organisations.id, {
     onDelete: 'cascade',
   }),
+  hardSkillsScore: real('hard_skills_score').default(0.5),
+  softSkillsScore: real('soft_skills_score').default(0.5),
   archived: boolean('archived').default(false).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
     .defaultNow()

@@ -21,6 +21,8 @@ export const getJobs = async (activeOnly = true) => {
       description: jobs.description,
       archived: jobs.archived,
       createdAt: jobs.createdAt,
+      hardSkillsScore: jobs.hardSkillsScore,
+      softSkillsScore: jobs.softSkillsScore,
       organisation: {
         id: organisations.id,
         name: organisations.name,
@@ -70,14 +72,26 @@ export const createJob = async (
   const organisationId = (formData.get('organisationId') as string) ?? '';
   const name = (formData.get('name') as string) ?? '';
   const description = (formData.get('description') as string) ?? '';
+  const hardSkillsScore =
+    Number.parseFloat(formData.get('hardSkillsScore') as string) ?? 0.5;
+  const softSkillsScore =
+    Number.parseFloat(formData.get('softSkillsScore') as string) ?? 0.5;
 
   const jobSchema = z.object({
     organisationId: z.string().min(1, 'Организация обязательна'),
     name: z.string().nonempty('Наименование не может быть пустым'),
     description: z.string().nonempty('Описание вакансии не может быть пустым'),
+    hardSkillsScore: z.number().min(0).max(1),
+    softSkillsScore: z.number().min(0).max(1),
   });
 
-  const parsed = jobSchema.safeParse({ organisationId, name, description });
+  const parsed = jobSchema.safeParse({
+    organisationId,
+    name,
+    description,
+    hardSkillsScore,
+    softSkillsScore,
+  });
   if (!parsed.success) {
     return formError(parsed.error.issues);
   }
@@ -99,6 +113,8 @@ export const createJob = async (
     organisationId,
     name,
     description,
+    hardSkillsScore,
+    softSkillsScore,
   });
 
   redirect('/jobs');
@@ -110,6 +126,8 @@ const updateJobSchema = z.object({
   name: z.string().nonempty('Наименование не может быть пустым'),
   description: z.string().nonempty('Описание вакансии не может быть пустым'),
   archived: z.boolean(),
+  hardSkillsScore: z.number().min(0).max(1),
+  softSkillsScore: z.number().min(0).max(1),
 });
 
 export const updateJob = async (
@@ -121,12 +139,18 @@ export const updateJob = async (
   const name = (formData.get('name') as string) ?? '';
   const description = (formData.get('description') as string) ?? '';
   const archived = (formData.get('archived') as string) === 'on';
+  const hardSkillsScore =
+    Number.parseFloat(formData.get('hardSkillsScore') as string) ?? 0.5;
+  const softSkillsScore =
+    Number.parseFloat(formData.get('softSkillsScore') as string) ?? 0.5;
   const parsed = updateJobSchema.safeParse({
     id,
     organisationId,
     name,
     description,
     archived,
+    hardSkillsScore,
+    softSkillsScore,
   });
   if (!parsed.success) {
     return formError(parsed.error.issues);
@@ -159,7 +183,14 @@ export const updateJob = async (
 
   await db
     .update(jobs)
-    .set({ name, description, organisationId, archived })
+    .set({
+      name,
+      description,
+      organisationId,
+      archived,
+      hardSkillsScore,
+      softSkillsScore,
+    })
     .where(eq(jobs.id, id));
 
   redirect('/jobs');

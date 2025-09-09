@@ -96,7 +96,7 @@ export function InterviewConference({
                             controls={{
                                 chat: false,
                                 screenShare: false,
-                                leave: false,
+                                leave: true,
                             }}
                             variation="minimal"
                         />

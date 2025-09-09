@@ -92,6 +92,13 @@
       "when": 1757333912735,
       "tag": "0012_wise_kulan_gath",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1757427661465,
+      "tag": "0013_glossy_wilson_fisk",
+      "breakpoints": true
     }
   ]
 }

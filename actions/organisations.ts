@@ -27,6 +27,7 @@ export async function getOrganisations() {
   if (!session?.user) {
     throw new Error('Unauthorized');
   }
+
   const orgs = await db.query.organisations.findMany({
     where: eq(organisations.userId, session.user.id as string),
   });

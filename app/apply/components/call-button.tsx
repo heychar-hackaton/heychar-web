@@ -50,10 +50,10 @@ export const CallButton = ({
         <Dialog onOpenChange={setIsOpen} open={isOpen}>
             <DialogTrigger asChild>
                 <Button
-                    className="group h-auto gap-4 py-2 text-left"
+                    className="group h-auto w-full justify-between gap-4 py-2 text-left"
                     variant="outline"
                 >
-                    <div className="space-y-1">
+                    <div className="w-full flex-1">
                         <h3 className="font-bold">Позвоните мне</h3>
                         <p className="whitespace-break-spaces font-normal text-muted-foreground">
                             Вам поступит звонок от HR-менеджера

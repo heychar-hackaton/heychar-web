@@ -52,12 +52,6 @@ export async function dispatchAgent(
   roomName: string,
   phoneNumber?: string | null
 ) {
-  const agentDispatchClient = new AgentDispatchClient(
-    process.env.LIVEKIT_URL || '',
-    process.env.LIVEKIT_API_KEY,
-    process.env.LIVEKIT_API_SECRET
-  );
-
   // Извлекаем ID интервью из имени комнаты
   const interviewId = roomName.replace('interview-', '');
   const interview = await getInterviewForApply(interviewId);
@@ -75,6 +69,7 @@ export async function dispatchAgent(
   console.log(`Dispatching agent with provider: ${secrets.provider}`);
 
   const metadata = {
+    interview_id: interviewId,
     company: {
       name: interview.organisation.name,
       description: interview.organisation.description,
@@ -91,8 +86,16 @@ export async function dispatchAgent(
     // Provider-specific secrets
     provider: secrets.provider,
     api_key: secrets.apiKey,
-    folder_id: secrets.folderId, // Only for Yandex
+    folder_id: secrets.folderId,
+    hard_skills_score: interview.job?.hardSkillsScore,
+    soft_skills_score: interview.job?.softSkillsScore,
   };
+
+  const agentDispatchClient = new AgentDispatchClient(
+    process.env.LIVEKIT_URL || '',
+    process.env.LIVEKIT_API_KEY,
+    process.env.LIVEKIT_API_SECRET
+  );
 
   await agentDispatchClient.createDispatch(
     roomName,
